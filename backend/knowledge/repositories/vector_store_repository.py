@@ -43,13 +43,13 @@ class VectorStoreRepository:
         )
 
 
-    def  add_documents(self,documents:list,batch_size:int=16)->int:
+    def  add_documents(self,documents:list,batch_size:int=10)->int:
         """
         将切分之后的文档块保存到向量数据库中
 
         Args:
             documents: 切分之后的文档块
-            batch_size: 分批保存文档块的批次大小
+            batch_size: 分批保存文档块的批次大小（DashScope限制最大10）
 
         Returns:
             int:成功添加到向量数据库中文档块的数量(服务前端展示)
@@ -60,15 +60,14 @@ class VectorStoreRepository:
         total_documents_chunks=len(documents)
 
         # 2. 分批次保存
-        # 场景：documents:[1,2,3,4,5] batch_size:2 遍历3次 第一次取到[1,2]  第二次取到[3,4]    第三次取到[5]
         documents_chunks_added=0
         try:
             for i in range(0,total_documents_chunks,batch_size):
-                bath=documents[i:batch_size+i]
+                bath=documents[i:i+batch_size]
                 self.vector_database.add_documents(bath)
                 documents_chunks_added=documents_chunks_added+len(bath)
                 logger.info(f"成功将文档块:{documents_chunks_added}/{total_documents_chunks}保存到向量数据库...")
-                return documents_chunks_added
+            return documents_chunks_added
         except Exception as e:
             logger.error(f"文档块列表:{documents}保存到向量数据库失败: {str(e)}")
             raise e
@@ -87,17 +86,23 @@ class VectorStoreRepository:
         """
         return self.embedding.embed_query(text)
 
-    def embedd_documents(self, texts:List[str])->List[List[float]]:
+    def embedd_documents(self, texts:List[str], batch_size:int=10)->List[List[float]]:
         """
-        对字符串列表进行向量化
+        对字符串列表进行向量化（分批处理，兼容DashScope API限制）
         Args:
          texts: 输入文本字符串列表
+         batch_size: 每批处理数量（DashScope限制最大10）
 
         Returns:
             List[List[float]]: 嵌入后的多个文本的浮点数列表
 
         """
-        return self.embedding.embed_documents(texts)
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i+batch_size]
+            batch_embeddings = self.embedding.embed_documents(batch)
+            all_embeddings.extend(batch_embeddings)
+        return all_embeddings
 
 
     def  search_similarity_with_score(self,user_question:str,top_k:int=5)->List[tuple[Document, float]]:

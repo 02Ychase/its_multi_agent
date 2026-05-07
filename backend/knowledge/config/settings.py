@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # Retrieval configuration
     TOP_ROUGH: int = 50
     TOP_FINAL: int = 5
+    TOP_K_TITLE: int = 5
 
     # BM25 retrieval configuration
     TOP_K_BM25: int = 10

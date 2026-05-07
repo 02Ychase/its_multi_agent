@@ -1,4 +1,4 @@
-from agents import function_tool, Runner
+from agents import function_tool, Runner, handoff
 from agents.run import RunConfig
 from langfuse.decorators import observe
 
@@ -71,6 +71,12 @@ async def query_service_station_and_navigate(
 AGENT_TOOLS = [
     consult_technical_expert,
     query_service_station_and_navigate
+]
+
+# 4. Handoff 目标（供编排器使用）
+HANDOFF_TARGETS = [
+    technical_agent,
+    comprehensive_service_agent,
 ]
 
 

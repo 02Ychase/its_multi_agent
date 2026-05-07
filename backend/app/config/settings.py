@@ -87,6 +87,25 @@ class Settings(BaseSettings):
         description="Langfuse Server URL"
     )
 
+    # ==================== JWT 认证配置 ====================
+
+    JWT_SECRET_KEY: str = Field(
+        default="change-me-in-production",
+        description="JWT 签名密钥"
+    )
+    JWT_ALGORITHM: str = Field(
+        default="HS256",
+        description="JWT 签名算法"
+    )
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
+        default=30,
+        description="Access Token 有效期（分钟）"
+    )
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = Field(
+        default=7,
+        description="Refresh Token 有效期（天）"
+    )
+
     # ==================== Pydantic Settings 配置 ====================
 
     model_config = SettingsConfigDict(

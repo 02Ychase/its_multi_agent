@@ -2,10 +2,15 @@ from pydantic_settings import BaseSettings,SettingsConfigDict
 import os
 
 class Settings(BaseSettings):
+    # LLM 配置
     API_KEY: str = os.environ.get("API_KEY")
     BASE_URL: str = os.environ.get("BASE_URL")
     MODEL: str = os.environ.get("MODEL")
+
+    # 嵌入模型配置（独立于LLM）
     EMBEDDING_MODEL: str = os.environ.get("EMBEDDING_MODEL")
+    EMBEDDING_API_KEY: str = os.environ.get("EMBEDDING_API_KEY")
+    EMBEDDING_BASE_URL: str = os.environ.get("EMBEDDING_BASE_URL")
 
     
     # knowledge/config

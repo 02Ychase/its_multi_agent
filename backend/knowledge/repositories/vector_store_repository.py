@@ -31,8 +31,8 @@ class VectorStoreRepository:
         # 使用API嵌入模型，配置从.env读取
         self.embedding = OpenAIEmbeddings(
             model=settings.EMBEDDING_MODEL,
-            openai_api_key=settings.API_KEY,
-            openai_api_base=settings.BASE_URL,
+            openai_api_key=settings.EMBEDDING_API_KEY or settings.API_KEY,
+            openai_api_base=settings.EMBEDDING_BASE_URL or settings.BASE_URL,
             check_embedding_ctx_length=False  # 兼容DashScope API格式
         )
 

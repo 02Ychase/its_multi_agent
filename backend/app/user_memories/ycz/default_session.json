@@ -1,0 +1,14 @@
+[
+  {
+    "role": "system",
+    "content": "你是一个有记忆的智能体助手，请基于上下文历史会话用户问题 (会话ID default_session)"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "您好！我主要协助处理技术咨询与服务站导航，其他问题暂不支持。如有技术或位置相关需求，随时可以问我。"
+  }
+]

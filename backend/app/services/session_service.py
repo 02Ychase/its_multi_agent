@@ -166,6 +166,27 @@ class SessionService:
 
         return formatted_sessions
 
+    def delete_session(self, user_id: str, session_id: str) -> bool:
+        """删除指定会话。
+
+        Args:
+            user_id: 用户ID。
+            session_id: 会话ID。
+
+        Returns:
+            True 如果删除成功，False 如果会话不存在。
+        """
+        try:
+            result = self._repo.delete_session(user_id, session_id)
+            if result:
+                logger.info(f"用户 {user_id} 的会话 {session_id} 已删除")
+            else:
+                logger.warning(f"用户 {user_id} 的会话 {session_id} 不存在")
+            return result
+        except Exception as e:
+            logger.error(f"删除用户 {user_id} 会话 {session_id} 失败: {str(e)}")
+            return False
+
     def _init_system_msg_instruct(self, session_id) -> List[Dict[str, Any]]:
         """
          初始化一个带系统角色的消息结构

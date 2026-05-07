@@ -1,12 +1,14 @@
 <template>
   <div class="app-wrapper">
     <div class="sidebar">
-      <div class="logo">ITS Knowledge</div>
+      <div class="logo-area">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">ITS Knowledge</span>
+      </div>
       <el-menu
         :default-active="activeMenu"
-        background-color="#001529"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
         router
         class="el-menu-vertical"
       >
@@ -43,58 +45,86 @@ const activeMenu = computed(() => route.path)
   display: flex;
   height: 100vh;
   width: 100%;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--color-background);
+  color: var(--text-primary);
 }
 
 .sidebar {
-  width: 240px;
-  background-color: #001529;
-  border-right: 1px solid #30363d;
+  width: 260px;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-  z-index: 10;
+  flex-shrink: 0;
 
-  .logo {
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    background: linear-gradient(90deg, #00f260, #0575e6);
-    -webkit-background-clip: text;
-    color: transparent;
-    border-bottom: 1px solid #30363d;
-    letter-spacing: 1px;
+  .logo-area {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 20px;
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      color: var(--color-accent);
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
   }
-  
+
   .el-menu-vertical {
     border-right: none;
+    padding: 8px;
+
+    :deep(.el-menu-item) {
+      border-radius: 8px;
+      margin-bottom: 4px;
+      height: 44px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+
+      &:hover {
+        background-color: var(--color-surface-raised);
+        color: var(--text-primary);
+      }
+
+      &.is-active {
+        background-color: var(--color-accent-light);
+        color: var(--color-accent);
+        font-weight: 600;
+      }
+    }
   }
 }
 
 .main-container {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
-  background-image: radial-gradient(#2d333b 1px, transparent 1px);
-  background-size: 30px 30px;
-  background-color: #0d1117;
+  background-color: var(--color-background);
 }
 
 .fade-transform-leave-active,
 .fade-transform-enter-active {
-  transition: all 0.4s ease;
+  transition: all 0.2s ease;
 }
 
 .fade-transform-enter-from {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: translateX(-12px);
 }
 
 .fade-transform-leave-to {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(12px);
 }
 </style>

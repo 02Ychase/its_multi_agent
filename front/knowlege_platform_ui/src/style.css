@@ -1,26 +1,53 @@
-/* Reset */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  --color-primary: #0F172A;
+  --color-on-primary: #FFFFFF;
+  --color-accent: #0369A1;
+  --color-accent-hover: #0284C7;
+  --color-accent-light: #E0F2FE;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #F1F5F9;
+  --color-muted: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-destructive: #DC2626;
+  --color-success: #16A34A;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --transition-fast: 150ms ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--color-background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar styling for Webkit */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
 
-::-webkit-scrollbar-track {
-  background: #0d1117; 
-}
- 
-::-webkit-scrollbar-thumb {
-  background: #30363d; 
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #58a6ff; 
+/* Element Plus Light Overrides */
+.el-button--primary {
+  --el-button-bg-color: var(--color-accent) !important;
+  --el-button-border-color: var(--color-accent) !important;
+  --el-button-hover-bg-color: var(--color-accent-hover) !important;
+  --el-button-hover-border-color: var(--color-accent-hover) !important;
 }

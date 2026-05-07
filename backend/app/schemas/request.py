@@ -25,3 +25,11 @@ class UserSessionsRequest(BaseModel):
     """
     user_id: str = Field(description="用户唯一标识符")     # 用于查询该用户的所有会话记录
 
+
+class DeleteSessionRequest(BaseModel):
+    """
+    删除用户会话的请求体。
+    """
+    user_id: str = Field(description="用户唯一标识符")
+    session_id: str = Field(description="要删除的会话ID")
+

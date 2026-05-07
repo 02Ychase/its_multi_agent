@@ -2,52 +2,49 @@
   <div class="knowledge-container">
     <div class="page-header">
       <h2>知识库管理</h2>
-      <p class="subtitle">Upload and manage your knowledge base documents</p>
+      <p class="subtitle">上传和管理知识库文档，支持 .txt、.md、.pdf 格式</p>
     </div>
 
-    <el-card class="upload-card">
+    <el-card class="upload-card" shadow="never">
       <template #header>
         <div class="card-header">
+          <el-icon><UploadFilled /></el-icon>
           <span>文件上传</span>
         </div>
       </template>
-      <div class="upload-area">
-        <el-upload
-          class="upload-demo"
-          drag
-          action=""
-          :http-request="handleUpload"
-          multiple
-          :show-file-list="false"
-        >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              Supported files: .txt, .md, .pdf (if supported by backend)
-            </div>
-          </template>
-        </el-upload>
-      </div>
+      <el-upload
+        class="upload-area"
+        drag
+        action=""
+        :http-request="handleUpload"
+        multiple
+        :show-file-list="false"
+      >
+        <div class="upload-content">
+          <el-icon class="upload-icon"><UploadFilled /></el-icon>
+          <div class="upload-text">拖拽文件到此处，或 <em>点击上传</em></div>
+          <div class="upload-tip">支持 .txt、.md、.pdf 格式文件</div>
+        </div>
+      </el-upload>
     </el-card>
 
     <div v-if="uploadHistory.length > 0" class="history-section">
       <h3>上传记录</h3>
-      <el-table :data="uploadHistory" style="width: 100%" :row-class-name="tableRowClassName">
-        <el-table-column prop="fileName" label="文件名" width="280" />
-        <el-table-column prop="chunks" label="新增切片数" width="150" align="center" />
-        <el-table-column prop="status" label="状态" width="120">
-          <template #default="scope">
-            <el-tag :type="scope.row.status === 'success' ? 'success' : 'danger'">
-              {{ scope.row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="message" label="信息" />
-        <el-table-column prop="time" label="时间" width="180" />
-      </el-table>
+      <el-card shadow="never" class="history-card">
+        <el-table :data="uploadHistory" style="width: 100%" :row-class-name="tableRowClassName">
+          <el-table-column prop="fileName" label="文件名" min-width="200" />
+          <el-table-column prop="chunks" label="切片数" width="100" align="center" />
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.status === 'success' ? 'success' : 'danger'" size="small" effect="light">
+                {{ scope.row.status === 'success' ? '成功' : '失败' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="message" label="信息" min-width="200" />
+          <el-table-column prop="time" label="时间" width="180" />
+        </el-table>
+      </el-card>
     </div>
   </div>
 </template>
@@ -74,100 +71,142 @@ const handleUpload = async (options) => {
       message: res.message,
       time: new Date().toLocaleString()
     })
-    ElMessage.success(`File ${file.name} uploaded successfully`)
+    ElMessage.success(`${file.name} 上传成功`)
   } catch (error) {
     uploadHistory.value.unshift({
       fileName: file.name,
       chunks: 0,
       status: 'error',
-      message: error.message || 'Upload failed',
+      message: error.message || '上传失败',
       time: new Date().toLocaleString()
     })
-    ElMessage.error(`Upload failed for ${file.name}`)
+    ElMessage.error(`${file.name} 上传失败`)
   }
 }
 
 const tableRowClassName = ({ rowIndex }) => {
-  if (rowIndex === 0) {
-    return 'success-row'
-  }
+  if (rowIndex === 0) return 'success-row'
   return ''
 }
 </script>
 
 <style lang="scss" scoped>
 .knowledge-container {
-  max-width: 1000px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
+
   h2 {
-    color: #fff;
-    margin-bottom: 10px;
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
   }
+
   .subtitle {
-    color: #8b949e;
+    color: var(--text-muted);
     font-size: 14px;
   }
 }
 
 .upload-card {
-  background-color: #161b22;
-  border: 1px solid #30363d;
-  color: #c9d1d9;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
 
   :deep(.el-card__header) {
-    border-bottom: 1px solid #30363d;
+    border-bottom: 1px solid var(--color-border);
+    padding: 16px 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
   }
 }
 
 .upload-area {
-  padding: 20px;
-  
+  :deep(.el-upload) {
+    width: 100%;
+  }
+
   :deep(.el-upload-dragger) {
-    background-color: #0d1117;
-    border-color: #30363d;
-    
+    width: 100%;
+    background-color: var(--color-surface-raised);
+    border: 2px dashed var(--color-border);
+    border-radius: 10px;
+    padding: 40px 20px;
+    transition: all 0.2s ease;
+
     &:hover {
-      border-color: #409EFF;
-      background-color: #161b22;
+      border-color: var(--color-accent);
+      background-color: var(--color-accent-light);
     }
-    
-    .el-icon--upload {
-      color: #58a6ff;
+  }
+
+  .upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .upload-icon {
+    font-size: 40px;
+    color: var(--color-accent);
+    margin-bottom: 4px;
+  }
+
+  .upload-text {
+    font-size: 15px;
+    color: var(--text-secondary);
+
+    em {
+      color: var(--color-accent);
+      font-style: normal;
+      font-weight: 600;
     }
-    
-    .el-upload__text {
-      color: #8b949e;
-      em {
-        color: #58a6ff;
-      }
-    }
+  }
+
+  .upload-tip {
+    font-size: 13px;
+    color: var(--text-muted);
   }
 }
 
 .history-section {
   h3 {
-    color: #fff;
-    margin-bottom: 20px;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
   }
-  
-  :deep(.el-table) {
-    background-color: #161b22;
-    color: #c9d1d9;
-    --el-table-border-color: #30363d;
-    --el-table-header-bg-color: #0d1117;
-    --el-table-row-hover-bg-color: #1f242d;
-    
-    th, tr {
-      background-color: #161b22;
+
+  .history-card {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+
+    :deep(.el-table) {
+      --el-table-border-color: var(--color-border);
+      --el-table-header-bg-color: var(--color-surface-raised);
+      --el-table-row-hover-bg-color: var(--color-accent-light);
     }
-    
-    .success-row {
-      background-color: #1c2518;
+
+    :deep(.el-table th) {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    :deep(.el-table td) {
+      color: var(--text-secondary);
     }
   }
 }

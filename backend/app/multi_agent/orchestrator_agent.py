@@ -11,6 +11,7 @@ from infrastructure.ai.prompt_loader import load_prompt
 from multi_agent.agent_factory import AGENT_TOOLS
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
+from multi_agent.after_sales_agent import after_sales_agent
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
 from contextlib import AsyncExitStack
 
@@ -25,6 +26,7 @@ orchestrator_agent = Agent(
     handoffs=[
         handoff(technical_agent),
         handoff(comprehensive_service_agent),
+        handoff(after_sales_agent),
     ],
 )
 

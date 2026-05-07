@@ -121,6 +121,23 @@ class SessionRepository:
 
         return results
 
+    def delete_session(self, user_id: str, session_id: str) -> bool:
+        """删除指定会话文件。
+
+        Args:
+            user_id: 用户ID。
+            session_id: 会话ID。
+
+        Returns:
+            True 如果删除成功，False 如果文件不存在。
+        """
+        file_path = self._get_file_path(user_id, session_id)
+        if not file_path.exists():
+            return False
+        file_path.unlink()
+        logger.info(f"已删除会话文件: {file_path}")
+        return True
+
     def _get_user_directory(self, user_id: str) -> Path:
         """获取用户的记忆文件夹路径对象。"""
         return self._storage_root / user_id

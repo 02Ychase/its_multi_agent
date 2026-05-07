@@ -11,7 +11,9 @@
   "dependencies": {
     "element-plus": "^2.11.8",
     "marked": "^17.0.1",
-    "vue": "^3.4.21"
+    "pinia": "^3.0.4",
+    "vue": "^3.4.21",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

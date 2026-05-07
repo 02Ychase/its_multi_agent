@@ -2,7 +2,7 @@ from fastapi.routing import APIRouter
 from fastapi import Depends
 from starlette.responses import StreamingResponse
 
-from schemas.request import ChatMessageRequest, UserSessionsRequest
+from schemas.request import ChatMessageRequest, UserSessionsRequest, DeleteSessionRequest
 from services.agent_service import MultiAgentService
 from infrastructure.logging.logger import logger
 from services.session_service import session_service
@@ -81,3 +81,29 @@ def get_user_sessions(request: UserSessionsRequest, current_user: dict = Depends
             "user_id": user_id,
             "error": str(e)
         }
+
+
+@router.post("/api/delete_session")
+def delete_session(request: DeleteSessionRequest, current_user: dict = Depends(get_current_user)):
+    """
+    删除用户的指定会话。
+
+    Args:
+        request: 包含 user_id 和 session_id 的请求体。
+
+    Returns:
+        包含删除结果的 JSON 响应。
+    """
+    user_id = request.user_id
+    session_id = request.session_id
+    logger.info(f"接收到删除会话请求: 用户 {user_id}, 会话 {session_id}")
+
+    try:
+        result = session_service.delete_session(user_id, session_id)
+        if result:
+            return {"success": True, "message": "会话已删除"}
+        else:
+            return {"success": False, "message": "会话不存在"}
+    except Exception as e:
+        logger.error(f"删除会话失败: {str(e)}")
+        return {"success": False, "message": str(e)}

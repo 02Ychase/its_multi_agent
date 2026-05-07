@@ -4,6 +4,7 @@ from langfuse import observe
 
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
+from multi_agent.after_sales_agent import after_sales_agent
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
 
 from infrastructure.logging.logger import logger
@@ -67,16 +68,48 @@ async def query_service_station_and_navigate(
         return f"业务专家暂时无法回答: {str(e)}"
 
 
-# 3. 将两个工具暴露出去
+# 3. 定义订单售后智能体工具
+@function_tool
+@observe(as_type="tool", name="consult_after_sales_expert")
+async def consult_after_sales_expert(
+        query: str,
+) -> str:
+    """
+    【订单售后专家】处理订单状态查询、保修期查询、维修进度查询、退换货政策咨询。
+    当用户询问：
+    1. "我的订单到哪了"、"订单号XXX的物流信息"（订单查询）。
+    2. "我的电脑还在保修期内吗"、"保修多久"（保修查询）。
+    3. "我的维修工单进度如何"、"电脑修好了吗"（维修进度）。
+    4. "买了7天还能退吗"、"换货流程是什么"（退换货政策）。
+    请调用此工具。
+
+    Args:
+        query: 用户的原始问题或完整指令。
+    """
+    try:
+        logger.info(f"[Route] 转交售后专家: {query[:30]}...")
+        result = await Runner.run(
+            after_sales_agent,
+            input=query,
+            run_config=RunConfig(tracing_disabled=True)
+        )
+        return result.final_output
+    except Exception as e:
+        return f"售后专家暂时无法回答: {str(e)}"
+
+
+# 4. 将三个工具暴露出去
 AGENT_TOOLS = [
     consult_technical_expert,
-    query_service_station_and_navigate
+    query_service_station_and_navigate,
+    consult_after_sales_expert,
 ]
 
-# 4. Handoff 目标（供编排器使用）
+# 5. Handoff 目标（供编排器使用）
 HANDOFF_TARGETS = [
     technical_agent,
     comprehensive_service_agent,
+    after_sales_agent,
 ]
 
 

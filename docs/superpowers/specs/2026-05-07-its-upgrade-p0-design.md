@@ -265,4 +265,4 @@ Execution flow:
 | File | Additions |
 |------|-----------|
 | `backend/app/requirements.txt` | `langfuse>=2.0.0` |
-| `backend/knowledge/requirements.txt` | `rank_bm25>=0.2.2`, `FlagEmbedding>=1.2.0` |
+| `backend/knowledge/requirements.txt` | `rank_bm25>=0.2.2`, `FlagEmbedding>=1.2.0`, `langfuse>=2.0.0` |

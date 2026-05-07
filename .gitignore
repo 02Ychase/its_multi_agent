@@ -1,6 +1,9 @@
 # Local agent/tool state
 .claude/
 
+# Logs
+logs/*.log
+
 # Environment and secrets
 .env
 .env.*

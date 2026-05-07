@@ -6,17 +6,11 @@ echo   ITS Multi-Agent System - Stopping...
 echo ============================================
 echo.
 
-echo [1/3] Stopping Knowledge Service...
-taskkill /FI "WINDOWTITLE eq ITS-Knowledge*" /F >nul 2>&1
-if %errorlevel%==0 (echo   [OK] Knowledge Service stopped) else (echo   [--] Knowledge Service not running)
-
-echo [2/3] Stopping Backend API...
-taskkill /FI "WINDOWTITLE eq ITS-Backend*" /F >nul 2>&1
-if %errorlevel%==0 (echo   [OK] Backend API stopped) else (echo   [--] Backend API not running)
-
-echo [3/3] Stopping Agent Web UI...
-taskkill /FI "WINDOWTITLE eq ITS-AgentUI*" /F >nul 2>&1
-if %errorlevel%==0 (echo   [OK] Agent Web UI stopped) else (echo   [--] Agent Web UI not running)
+echo Stopping all services on ports 8000, 8001, 5173, 3000...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8001.*LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5173.*LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000.*LISTENING"') do taskkill /PID %%a /F >nul 2>&1
 
 echo.
 echo ============================================

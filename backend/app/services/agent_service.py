@@ -1,7 +1,7 @@
 import re
 from collections.abc import AsyncGenerator
 from agents.run import Runner, RunConfig
-from langfuse.decorators import observe
+from langfuse import observe
 from multi_agent.orchestrator_agent import orchestrator_agent
 from schemas.request import ChatMessageRequest
 from services.session_service import session_service

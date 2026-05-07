@@ -1,6 +1,6 @@
 from agents import function_tool, Runner, handoff
 from agents.run import RunConfig
-from langfuse.decorators import observe
+from langfuse import observe
 
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent

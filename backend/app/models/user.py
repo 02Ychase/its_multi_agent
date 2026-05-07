@@ -1,12 +1,16 @@
-from infrastructure.database.database_pool import db_pool
+from infrastructure.database.database_pool import DatabasePool
 from infrastructure.logging.logger import logger
+
+
+def _get_conn():
+    """Get a database connection from the pool."""
+    return DatabasePool.get_connection()
 
 
 def init_users_table():
     """Create users table if it doesn't exist."""
-    conn = None
+    conn = _get_conn()
     try:
-        conn = db_pool.get_connection()
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -25,15 +29,13 @@ def init_users_table():
         logger.error(f"Failed to create users table: {e}")
         raise
     finally:
-        if conn:
-            db_pool.release_connection(conn)
+        conn.close()
 
 
 def get_user_by_username(username: str) -> dict | None:
     """Get user by username."""
-    conn = None
+    conn = _get_conn()
     try:
-        conn = db_pool.get_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, username, email, hashed_password, is_active FROM users WHERE username = %s",
@@ -53,15 +55,13 @@ def get_user_by_username(username: str) -> dict | None:
         logger.error(f"Failed to get user by username: {e}")
         return None
     finally:
-        if conn:
-            db_pool.release_connection(conn)
+        conn.close()
 
 
 def create_user(username: str, email: str, hashed_password: str) -> dict | None:
     """Create a new user and return user info."""
-    conn = None
+    conn = _get_conn()
     try:
-        conn = db_pool.get_connection()
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO users (username, email, hashed_password) VALUES (%s, %s, %s)",
@@ -75,5 +75,4 @@ def create_user(username: str, email: str, hashed_password: str) -> dict | None:
         logger.error(f"Failed to create user: {e}")
         return None
     finally:
-        if conn:
-            db_pool.release_connection(conn)
+        conn.close()

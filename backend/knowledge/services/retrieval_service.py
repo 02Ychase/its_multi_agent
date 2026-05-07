@@ -12,7 +12,7 @@ from services.ingestion.ingestion_processor import IngestionProcessor
 from utils.markdown_utils import MarkDownUtils
 from config.settings import settings
 from sklearn.metrics.pairwise import cosine_similarity
-from langfuse.decorators import observe
+from langfuse import observe
 
 
 class RetrievalService:
@@ -57,7 +57,7 @@ class RetrievalService:
             self._reranker_service = RerankerService()
         return self._reranker_service
 
-    @observe(as_type="retrieval", name="rag_retrieval")
+    @observe(as_type="retriever", name="rag_retrieval")
     def retrieval(self, user_question: str) -> List[Document]:
         """
         Core retrieval method with hybrid search pipeline.

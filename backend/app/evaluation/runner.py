@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Any
 
-from langfuse.decorators import observe
+from langfuse import observe
 from infrastructure.observability.langfuse_client import langfuse, flush_langfuse
 from evaluation.judge import llm_judge
 

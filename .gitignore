@@ -83,4 +83,8 @@ Desktop.ini
 !**/.vscode/*.code-snippets
 
 
-backend/openai-agents-tutorial/*
+backend/openai-agents-tutorial/
+
+docs/
+
+logs/

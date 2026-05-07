@@ -9,7 +9,7 @@ logger=logging.getLogger(__name__)
 from langchain_chroma import Chroma
 from config.settings import settings
 from langchain_core.documents import Document
-from langchain_openai.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from typing import List
 
 # 3. from 自己的
@@ -28,10 +28,11 @@ class VectorStoreRepository:
         创建嵌入模型的实例
         向量数据库能力: 1.存储向量数据 2.搜索能力（向量数据库检索器）
         """
-        self.embedding = OpenAIEmbeddings(
-            model=settings.EMBEDDING_MODEL,
-            openai_api_key=settings.API_KEY,
-            openai_api_base=settings.BASE_URL
+        # 使用本地嵌入模型，无需API密钥
+        self.embedding = HuggingFaceEmbeddings(
+            model_name="shibing624/text2vec-base-chinese",
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': True}
         )
 
         self.vector_database = Chroma(

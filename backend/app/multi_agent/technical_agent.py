@@ -8,7 +8,7 @@ from agents import Runner,RunConfig
 
 # 1. 定义技术智能体
 technical_agent = Agent(
-    name="资讯与技术专家",
+    name="technical_expert",
     instructions=load_prompt("technical_agent"),
     model=sub_model,
     tools=[query_knowledge],

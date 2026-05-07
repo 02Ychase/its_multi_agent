@@ -16,7 +16,7 @@ from contextlib import AsyncExitStack
 
 # 1. 创建主调度智能体（支持 Tool Calling + Handoff 双模式）
 orchestrator_agent = Agent(
-    name="主调度智能体",
+    name="orchestrator",
     instructions=load_prompt("orchestrator_v2"),
     # model=main_model,   # 推理模型（ds_r1[1.科学 2.计算 3.需求拆解]） (已推理为主，干活其次【funcation_call】)
     model=sub_model,      # 通用模型（已干活为主 推理可能有或者都没有）

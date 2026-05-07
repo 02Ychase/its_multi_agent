@@ -14,7 +14,7 @@ from infrastructure.tools.mcp.mcp_servers import (
 from infrastructure.ai.prompt_loader import load_prompt
 
 comprehensive_service_agent = Agent(
-    name="全能业务智能体",
+    name="service_expert",
     instructions=load_prompt("comprehensive_service_agent"),
     model=sub_model,
     # 本地工具：只有服务站查询相关

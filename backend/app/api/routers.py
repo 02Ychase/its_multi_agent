@@ -1,10 +1,12 @@
 from fastapi.routing import APIRouter
+from fastapi import Depends
 from starlette.responses import StreamingResponse
 
 from schemas.request import ChatMessageRequest, UserSessionsRequest
 from services.agent_service import MultiAgentService
 from infrastructure.logging.logger import logger
 from services.session_service import session_service
+from api.auth_router import get_current_user
 
 # 1. 定义请求路由器
 router = APIRouter()
@@ -12,7 +14,7 @@ router = APIRouter()
 
 # 2. 定义对话请求
 @router.post("/api/query", summary="智能体对话接口")
-async def query(request_context: ChatMessageRequest) -> StreamingResponse:
+async def query(request_context: ChatMessageRequest, current_user: dict = Depends(get_current_user)) -> StreamingResponse:
     """
     SSE返回数据（流式响应）
     响应头中：text/event-stream
@@ -42,7 +44,7 @@ async def query(request_context: ChatMessageRequest) -> StreamingResponse:
 
 
 @router.post("/api/user_sessions")
-def get_user_sessions(request: UserSessionsRequest):
+def get_user_sessions(request: UserSessionsRequest, current_user: dict = Depends(get_current_user)):
     """
     获取用户的所有会话记忆数据。
 

@@ -24,41 +24,42 @@ class BM25Retriever:
         self._build_index()
 
     def _build_index(self):
-        """Build BM25 index from all markdown files in crawl directory."""
-        crawl_dir = settings.CRAWL_OUTPUT_DIR
-        if not os.path.exists(crawl_dir):
-            logger.warning(f"Crawl directory not found: {crawl_dir}")
-            return
-
-        md_files = [f for f in os.listdir(crawl_dir) if f.endswith('.md')]
-        if not md_files:
-            logger.warning(f"No markdown files found in {crawl_dir}")
-            return
+        """Build BM25 index from all markdown files in crawl and uploaded directories."""
+        # 扫描 crawl 目录和 uploaded 目录
+        dirs_to_scan = [
+            settings.CRAWL_OUTPUT_DIR,
+            os.path.join(settings._project_root, "data", "uploaded"),
+        ]
 
         tokenized_corpus = []
-        for md_file in md_files:
-            file_path = os.path.join(crawl_dir, md_file)
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read().strip()
-                if not content:
-                    continue
-
-                title = os.path.splitext(md_file)[0]
-                # Remove numeric prefix like "0004-"
-                if '-' in title:
-                    title = title.split('-', 1)[1]
-
-                self.corpus_texts.append(content)
-                self.corpus_paths.append(file_path)
-                self.corpus_titles.append(title)
-
-                # Tokenize with jieba for Chinese text
-                tokens = list(jieba.cut(content))
-                tokenized_corpus.append(tokens)
-            except Exception as e:
-                logger.error(f"Failed to read {file_path}: {e}")
+        for scan_dir in dirs_to_scan:
+            if not os.path.exists(scan_dir):
                 continue
+
+            md_files = [f for f in os.listdir(scan_dir) if f.endswith('.md')]
+            for md_file in md_files:
+                file_path = os.path.join(scan_dir, md_file)
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read().strip()
+                    if not content:
+                        continue
+
+                    title = os.path.splitext(md_file)[0]
+                    # Remove numeric prefix like "0004-"
+                    if '-' in title:
+                        title = title.split('-', 1)[1]
+
+                    self.corpus_texts.append(content)
+                    self.corpus_paths.append(file_path)
+                    self.corpus_titles.append(title)
+
+                    # Tokenize with jieba for Chinese text
+                    tokens = list(jieba.cut(content))
+                    tokenized_corpus.append(tokens)
+                except Exception as e:
+                    logger.error(f"Failed to read {file_path}: {e}")
+                    continue
 
         if tokenized_corpus:
             self.bm25 = BM25Okapi(tokenized_corpus)

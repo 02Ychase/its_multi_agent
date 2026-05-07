@@ -66,8 +66,16 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"文件上传到知识库失败:{str(e)}")
 
     finally:
-        # 4. 清空临时文件路径(磁盘空间不足)
+        # 4. 清空临时文件，但保留副本到永久目录
         if temp_file_path and os.path.exists(temp_file_path):
+            # 保存到永久目录
+            uploaded_dir = os.path.join(settings._project_root, "data", "uploaded")
+            os.makedirs(uploaded_dir, exist_ok=True)
+            permanent_path = os.path.join(uploaded_dir, file.filename)
+            shutil.copy2(tmp_md_path, permanent_path)
+            logger.info(f"文档已保存到永久目录:{permanent_path}")
+
+            # 删除临时文件
             os.remove(temp_file_path)
             logger.info(f"临时文件:{temp_file_path}已删除...")
 

@@ -1,6 +1,7 @@
 import re
 from collections.abc import AsyncGenerator
 from agents.run import Runner, RunConfig
+from langfuse.decorators import observe
 from multi_agent.orchestrator_agent import orchestrator_agent
 from schemas.request import ChatMessageRequest
 from services.session_service import session_service
@@ -19,6 +20,7 @@ class MultiAgentService:
     """
 
     @classmethod
+    @observe(as_type="agent", name="orchestrator")
     async def process_task(cls, request: ChatMessageRequest, flag: bool) -> AsyncGenerator:
         """
         多智能体处理任务入口

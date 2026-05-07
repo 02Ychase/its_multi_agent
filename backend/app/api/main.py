@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from api.routers import router
 from infrastructure.logging.logger import logger
 from infrastructure.tools.mcp.mcp_manager import mcp_connect, mcp_cleanup
+from infrastructure.observability.langfuse_client import flush_langfuse
 
 
 @asynccontextmanager
@@ -32,6 +33,9 @@ async def lifespan(app: FastAPI):
         logger.info("MCP连接清理完成")
     except Exception as e:
         logger.error(f"MCP连接清理失败: {str(e)}")
+
+    flush_langfuse()
+    logger.info("Langfuse事件已刷新")
 
 
 def create_fast_api() -> FastAPI:

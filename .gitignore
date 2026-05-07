@@ -6,6 +6,7 @@
 .env.*
 !.env.example
 !.env.template
+!.env.docker
 
 # Python caches and bytecode
 __pycache__/

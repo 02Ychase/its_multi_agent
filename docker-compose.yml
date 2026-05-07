@@ -1,0 +1,137 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: its-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-its_db}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  langfuse-db:
+    image: postgres:15-alpine
+    container_name: its-langfuse-db
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse_secret
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  langfuse-server:
+    image: langfuse/langfuse:latest
+    container_name: its-langfuse-server
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgresql://langfuse:langfuse_secret@langfuse-db:5432/langfuse
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-its-multi-agent-secret}
+      NEXTAUTH_URL: http://localhost:3001
+      SALT: ${LANGFUSE_SALT:-its-multi-agent-salt}
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: its-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - backend/app/.env
+    environment:
+      MYSQL_HOST: mysql
+      KNOWLEDGE_BASE_URL: http://knowledge:8001
+      LANGFUSE_HOST: http://langfuse-server:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      knowledge:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  knowledge:
+    build:
+      context: .
+      dockerfile: docker/knowledge.Dockerfile
+    container_name: its-knowledge
+    ports:
+      - "8001:8001"
+    env_file:
+      - backend/knowledge/.env
+    environment:
+      MYSQL_HOST: mysql
+    volumes:
+      - chroma-data:/app/chroma_kb1
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  agent-web-ui:
+    build:
+      context: .
+      dockerfile: docker/frontend-agent.Dockerfile
+    container_name: its-agent-web-ui
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  knowledge-ui:
+    build:
+      context: .
+      dockerfile: docker/frontend-knowledge.Dockerfile
+    container_name: its-knowledge-ui
+    restart: unless-stopped
+    networks:
+      - its-network
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: its-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - knowledge
+      - agent-web-ui
+      - knowledge-ui
+    restart: unless-stopped
+    networks:
+      - its-network
+
+volumes:
+  mysql-data:
+  langfuse-db-data:
+  chroma-data:
+
+networks:
+  its-network:
+    driver: bridge

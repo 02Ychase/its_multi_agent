@@ -1,5 +1,6 @@
-from agents import function_tool, Runner
+from agents import function_tool, Runner, handoff
 from agents.run import RunConfig
+from langfuse.decorators import observe
 
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
@@ -10,6 +11,7 @@ from infrastructure.logging.logger import logger
 
 # 1. 定义技术专家智能体工具
 @function_tool
+@observe(as_type="tool", name="consult_technical_expert")
 async def consult_technical_expert(
         query: str,
 ) -> str:
@@ -39,6 +41,7 @@ async def consult_technical_expert(
 
 # 2. 定义全能业务智能体工具
 @function_tool
+@observe(as_type="tool", name="query_service_station_and_navigate")
 async def query_service_station_and_navigate(
         query: str,
 ) -> str:
@@ -68,6 +71,12 @@ async def query_service_station_and_navigate(
 AGENT_TOOLS = [
     consult_technical_expert,
     query_service_station_and_navigate
+]
+
+# 4. Handoff 目标（供编排器使用）
+HANDOFF_TARGETS = [
+    technical_agent,
+    comprehensive_service_agent,
 ]
 
 

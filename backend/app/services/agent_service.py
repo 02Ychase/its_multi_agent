@@ -1,6 +1,7 @@
 import re
 from collections.abc import AsyncGenerator
 from agents.run import Runner, RunConfig
+from langfuse.decorators import observe
 from multi_agent.orchestrator_agent import orchestrator_agent
 from schemas.request import ChatMessageRequest
 from services.session_service import session_service
@@ -19,6 +20,7 @@ class MultiAgentService:
     """
 
     @classmethod
+    @observe(as_type="agent", name="orchestrator")
     async def process_task(cls, request: ChatMessageRequest, flag: bool) -> AsyncGenerator:
         """
         多智能体处理任务入口
@@ -37,11 +39,11 @@ class MultiAgentService:
             # 2. 准备历史对话
             chat_history = session_service.prepare_history(user_id, session_id, user_query)
 
-            # 3. 运行Agent (流式模式)
+            # 3. 运行Agent (流式模式，传入完整历史对话)
             streaming_result = Runner.run_streamed(
                 starting_agent=orchestrator_agent,
-                input=user_query,  # 直接传递用户输入
-                max_turns=5,  # COT(思考 行动 观察)--->迭代多少次（不是异常重试）
+                input=chat_history,
+                max_turns=5,
                 run_config=RunConfig(tracing_disabled=True)
             )
 

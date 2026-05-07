@@ -1,0 +1,109 @@
+# ITS Multi-Agent Evaluation Test Cases
+# Categories: intent_recognition, rag_retrieval, multi_turn
+
+# ============================================================
+# Intent Recognition Tests
+# ============================================================
+- id: "intent_001"
+  query: "我的电脑开机蓝屏怎么办"
+  expected_intent: "technical"
+  expected_agent: "consult_technical_expert"
+  expected_keywords: ["蓝屏", "开机"]
+  category: "intent_recognition"
+
+- id: "intent_002"
+  query: "帮我找一下附近的维修站"
+  expected_intent: "service"
+  expected_agent: "query_service_station_and_navigate"
+  expected_keywords: ["维修", "服务站"]
+  category: "intent_recognition"
+
+- id: "intent_003"
+  query: "今天北京天气怎么样"
+  expected_intent: "technical"
+  expected_agent: "consult_technical_expert"
+  expected_keywords: ["天气"]
+  category: "intent_recognition"
+
+- id: "intent_004"
+  query: "怎么去天安门广场"
+  expected_intent: "service"
+  expected_agent: "query_service_station_and_navigate"
+  expected_keywords: ["天安门"]
+  category: "intent_recognition"
+
+- id: "intent_005"
+  query: "查一下小米股价，然后导航去小米之家"
+  expected_intent: "multi"
+  expected_agents:
+    - "consult_technical_expert"
+    - "query_service_station_and_navigate"
+  expected_keywords: ["小米"]
+  category: "intent_recognition"
+
+# ============================================================
+# RAG Retrieval Tests
+# ============================================================
+- id: "rag_001"
+  query: "如何使用U盘安装Windows 7操作系统"
+  expected_keywords: ["U盘", "Windows 7", "安装"]
+  category: "rag_retrieval"
+
+- id: "rag_002"
+  query: "电脑开机后没有任何反应怎么办"
+  expected_keywords: ["开机", "反应", "电源"]
+  category: "rag_retrieval"
+
+- id: "rag_003"
+  query: "手机平板画面无线传输到电视"
+  expected_keywords: ["无线", "传输", "电视"]
+  category: "rag_retrieval"
+
+- id: "rag_004"
+  query: "电脑经常死机如何解决"
+  expected_keywords: ["死机", "内存", "散热"]
+  category: "rag_retrieval"
+
+- id: "rag_005"
+  query: "Windows系统如何还原"
+  expected_keywords: ["还原", "系统", "恢复"]
+  category: "rag_retrieval"
+
+# ============================================================
+# Multi-turn Conversation Tests
+# ============================================================
+- id: "multi_turn_001"
+  turns:
+    - role: "user"
+      content: "我的电脑开不了机"
+    - role: "assistant"
+      content: "请检查电源线是否连接正常，尝试更换电源插座..."
+    - role: "user"
+      content: "试了还是不行，帮我找最近的维修站"
+  expected_intent: "service"
+  expected_agent: "query_service_station_and_navigate"
+  category: "multi_turn"
+
+- id: "multi_turn_002"
+  turns:
+    - role: "user"
+      content: "电脑蓝屏了"
+    - role: "assistant"
+      content: "蓝屏通常由以下原因导致..."
+    - role: "user"
+      content: "那个错误代码是什么意思"
+  expected_intent: "technical"
+  expected_agent: "consult_technical_expert"
+  category: "multi_turn"
+
+- id: "multi_turn_003"
+  turns:
+    - role: "user"
+      content: "帮我查一下故宫今天开不开门"
+    - role: "assistant"
+      content: "故宫今天开放..."
+    - role: "user"
+      content: "那帮我导航过去"
+  expected_intent: "service"
+  expected_agent: "query_service_station_and_navigate"
+  category: "multi_turn"

@@ -34,8 +34,7 @@
           登录
         </button>
         <div class="login-hint">
-          <p>测试用户：root1, root2, root3</p>
-          <p>密码：123456</p>
+          <p>请使用注册的账号登录</p>
         </div>
       </div>
     </div>
@@ -303,21 +302,12 @@ export default {
       document.removeEventListener('click', handleClickOutside);
     });
     
-    // 初始化时检查localStorage中的用户信息，恢复currentUser
+    // 初始化时检查localStorage中的token
+    const savedToken = localStorage.getItem('accessToken');
     const savedUserId = localStorage.getItem('currentUserId');
-    if (savedUserId) {
-      // 定义测试用户列表，与handleLogin中保持一致
-      const validUsers = [
-        { username: 'root1', password: '123456', userId: 'root1' },
-        { username: 'root2', password: '123456', userId: 'root2' },
-        { username: 'root3', password: '123456', userId: 'root3' }
-      ];
-      
-      // 查找对应的用户并设置currentUser
-      const savedUser = validUsers.find(u => u.userId === savedUserId);
-      if (savedUser) {
-        currentUser.value = savedUser.username;
-      }
+    if (savedToken && savedUserId) {
+      currentUser.value = savedUserId;
+      isLoggedIn.value = true;
     }
     
     // 主界面相关状态
@@ -394,34 +384,33 @@ const handleServiceStation = () => {
     };
 
     // 处理登录
-    const handleLogin = () => {
-      // 清空错误信息
+    const handleLogin = async () => {
       loginError.value = '';
-      
-      // 定义测试用户列表
-      const validUsers = [
-        { username: 'root1', password: '123456', userId: 'root1' },
-        { username: 'root2', password: '123456', userId: 'root2' },
-        { username: 'root3', password: '123456', userId: 'root3' }
-      ];
-      
-      // 查找用户
-      const user = validUsers.find(u => u.username === username.value && u.password === password.value);
-      
-      if (user) {
-        // 登录成功
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username.value, password: password.value })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          loginError.value = error.detail || '用户名或密码错误';
+          return;
+        }
+
+        const data = await response.json();
         isLoggedIn.value = true;
-        currentUser.value = user.username;
-        // 保存用户ID（在实际应用中可能会保存token）
-        localStorage.setItem('currentUserId', user.userId);
-        // 登录成功后执行页面滚动到顶部
+        currentUser.value = data.user.username;
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+        localStorage.setItem('currentUserId', data.user.username);
         window.scrollTo(0, 0);
-        // 清空输入
         username.value = '';
         password.value = '';
-      } else {
-        // 登录失败
-        loginError.value = '用户名或密码错误';
+      } catch (error) {
+        loginError.value = '登录失败，请检查网络连接';
       }
     };
 
@@ -434,7 +423,8 @@ const handleServiceStation = () => {
         const response = await fetch('http://127.0.0.1:8000/api/user_sessions', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           },
           body: JSON.stringify({"user_id": currentUser.value})
         });
@@ -534,6 +524,8 @@ const handleServiceStation = () => {
       isLoggedIn.value = false;
       currentUser.value = '';
       localStorage.removeItem('currentUserId');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       // 清空聊天内容
       processMessages.value = [];
       answerText.value = '';
@@ -623,7 +615,8 @@ const handleServiceStation = () => {
           const response = await fetch('http://127.0.0.1:8000/api/query', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
             body: JSON.stringify(requestData)
           });

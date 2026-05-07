@@ -3,8 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from api.routers import router
+from api.auth_router import router as auth_router
 from infrastructure.logging.logger import logger
 from infrastructure.tools.mcp.mcp_manager import mcp_connect, mcp_cleanup
+from infrastructure.observability.langfuse_client import flush_langfuse
 
 
 @asynccontextmanager
@@ -23,6 +25,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"MCP连接建立失败: {str(e)}")
 
+    try:
+        from models.user import init_users_table
+        init_users_table()
+        logger.info("用户表初始化完成")
+    except Exception as e:
+        logger.error(f"用户表初始化失败: {str(e)}")
+
     yield  # 应用运行期间（先别释放mcp链接 去处理请求...）
 
     # 应用关闭时执行
@@ -32,6 +41,9 @@ async def lifespan(app: FastAPI):
         logger.info("MCP连接清理完成")
     except Exception as e:
         logger.error(f"MCP连接清理失败: {str(e)}")
+
+    flush_langfuse()
+    logger.info("Langfuse事件已刷新")
 
 
 def create_fast_api() -> FastAPI:
@@ -50,6 +62,7 @@ def create_fast_api() -> FastAPI:
 
     # 3. 注册各种路由
     app.include_router(router=router)
+    app.include_router(router=auth_router)
 
     # 4.返回创建的FastAPI
     return app

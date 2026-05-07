@@ -1,0 +1,80 @@
+# Local agent/tool state
+.claude/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Python caches and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Python packaging/build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+wheels/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+
+# Node/Vite frontend artifacts
+node_modules/
+.vite/
+.vitepress/cache/
+dist-ssr/
+*.local
+*.tsbuildinfo
+.npm/
+.pnpm-store/
+.yarn/
+.pnp.*
+
+# Logs and runtime files
+logs/
+*.log
+*.pid
+*.seed
+
+# Local databases and vector stores
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+backend/knowledge/chroma_kb1/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE/editor local settings
+.idea/
+**/.vscode/*
+!**/.vscode/extensions.json
+!**/.vscode/*.code-snippets
+

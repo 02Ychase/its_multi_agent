@@ -1,40 +1,54 @@
 <template>
   <div class="app-container">
-    <!-- 登录页面 -->
+    <!-- 登录/注册页面 -->
     <div v-if="!isLoggedIn" class="login-container">
       <div class="login-form">
         <div class="its-logo-flat login-logo">
             <img src="/its-logo.svg" alt="ITS Logo" width="60" height="60"/>
           </div>
-        <h1 class="login-title">ITS系统登录</h1>
+        <h1 class="login-title">{{ isRegisterMode ? 'ITS系统注册' : 'ITS系统登录' }}</h1>
         <div class="login-input-group">
           <label for="username">用户名</label>
-          <input 
+          <input
             id="username"
             v-model="username"
             type="text"
             placeholder="请输入用户名"
-            @keyup.enter="handleLogin"
+            @keyup.enter="isRegisterMode ? handleRegister() : handleLogin()"
+          />
+        </div>
+        <div v-if="isRegisterMode" class="login-input-group">
+          <label for="email">邮箱</label>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            placeholder="请输入邮箱"
+            @keyup.enter="handleRegister"
           />
         </div>
         <div class="login-input-group">
           <label for="password">密码</label>
-          <input 
+          <input
             id="password"
             v-model="password"
             type="password"
-            placeholder="请输入密码"
-            @keyup.enter="handleLogin"
+            :placeholder="isRegisterMode ? '密码至少6位' : '请输入密码'"
+            @keyup.enter="isRegisterMode ? handleRegister() : handleLogin()"
           />
         </div>
         <div v-if="loginError" class="login-error">
           {{ loginError }}
         </div>
-        <button class="login-button btn-primary" @click="handleLogin">
+        <button v-if="isRegisterMode" class="login-button btn-primary" @click="handleRegister">
+          注册
+        </button>
+        <button v-else class="login-button btn-primary" @click="handleLogin">
           登录
         </button>
-        <div class="login-hint">
-          <p>请使用注册的账号登录</p>
+        <div class="login-toggle">
+          <span v-if="isRegisterMode">已有账号？<a href="#" @click.prevent="isRegisterMode = false; loginError = ''">去登录</a></span>
+          <span v-else>没有账号？<a href="#" @click.prevent="isRegisterMode = true; loginError = ''">去注册</a></span>
         </div>
       </div>
     </div>
@@ -266,10 +280,12 @@ export default {
   setup() {
     // 登录相关状态
     const isLoggedIn = ref(true);
+    const isRegisterMode = ref(false);
     // 侧边栏展开/收起状态
     const isSidebarExpanded = ref(true);
     const username = ref('');
     const password = ref('');
+    const email = ref('');
     const currentUser = ref('');
     const loginError = ref('');
     // 用户信息显示状态（用于头像点击显示用户信息）
@@ -411,6 +427,47 @@ const handleServiceStation = () => {
         password.value = '';
       } catch (error) {
         loginError.value = '登录失败，请检查网络连接';
+      }
+    };
+
+    // 处理注册
+    const handleRegister = async () => {
+      loginError.value = '';
+
+      if (!username.value || !password.value || !email.value) {
+        loginError.value = '请填写所有字段';
+        return;
+      }
+      if (password.value.length < 6) {
+        loginError.value = '密码长度不能少于6位';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.value,
+            email: email.value,
+            password: password.value
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          loginError.value = error.detail || '注册失败';
+          return;
+        }
+
+        // 注册成功，自动切换到登录模式并提示
+        loginError.value = '';
+        isRegisterMode.value = false;
+        email.value = '';
+        password.value = '';
+        alert('注册成功！请登录');
+      } catch (error) {
+        loginError.value = '注册失败，请检查网络连接';
       }
     };
 
@@ -956,14 +1013,17 @@ const handleServiceStation = () => {
     return {
       // 登录相关状态
       isLoggedIn,
+      isRegisterMode,
       username,
       password,
+      email,
       currentUser,
       loginError,
       showUserInfo,
       toggleUserInfo,
       avatarContainerRef,
       handleLogin,
+      handleRegister,
       handleLogout,
       goToLogin,
       // 主界面相关
@@ -1201,6 +1261,22 @@ const handleServiceStation = () => {
 
 .login-hint p {
   margin: 5px 0;
+}
+
+.login-toggle {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-toggle a {
+  color: #2196F3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-toggle a:hover {
+  text-decoration: underline;
 }
 
 /* 用户信息和登出按钮 */

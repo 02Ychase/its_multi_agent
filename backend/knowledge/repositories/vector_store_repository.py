@@ -32,7 +32,8 @@ class VectorStoreRepository:
         self.embedding = OpenAIEmbeddings(
             model=settings.EMBEDDING_MODEL,
             openai_api_key=settings.API_KEY,
-            openai_api_base=settings.BASE_URL
+            openai_api_base=settings.BASE_URL,
+            check_embedding_ctx_length=False  # 兼容DashScope API格式
         )
 
         self.vector_database = Chroma(

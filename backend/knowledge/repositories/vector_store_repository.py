@@ -29,9 +29,9 @@ class VectorStoreRepository:
         向量数据库能力: 1.存储向量数据 2.搜索能力（向量数据库检索器）
         """
         self.embedding = OpenAIEmbeddings(
-            model="text-embedding-3-large",
-            openai_api_key="sk-3fNNVrOHy9YbLm87IQZdCe9VZDI9rA5CcCRfe9Nw2w9yyEAT",
-            openai_api_base="https://api.openai-proxy.org/v1"
+            model=settings.EMBEDDING_MODEL,
+            openai_api_key=settings.API_KEY,
+            openai_api_base=settings.BASE_URL
         )
 
         self.vector_database = Chroma(

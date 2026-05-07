@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     TOP_ROUGH: int = 50
     TOP_FINAL: int = 5
 
+    # BM25 retrieval configuration
+    TOP_K_BM25: int = 10
+
+    # HyDE configuration
+    HYDE_ENABLED: bool = True
+
+    # Reranker configuration
+    RERANKER_MODEL: str = "BAAI/bge-reranker-v2-m3"
+    RERANKER_ENABLED: bool = True
+
     model_config = SettingsConfigDict(
         env_file=os.path.join(_project_root, ".env"),
         env_file_encoding="utf-8",

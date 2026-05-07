@@ -7,3 +7,4 @@ openai
 httpx
 openai-agents
 pystun3
+langfuse>=2.0.0

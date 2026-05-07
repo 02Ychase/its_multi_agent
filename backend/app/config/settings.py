@@ -72,6 +72,21 @@ class Settings(BaseSettings):
         description="百度地图 AK (Access Key)"
     )
 
+    # ==================== Langfuse 可观测性配置 ====================
+
+    LANGFUSE_PUBLIC_KEY: Optional[str] = Field(
+        default=None,
+        description="Langfuse Public Key"
+    )
+    LANGFUSE_SECRET_KEY: Optional[str] = Field(
+        default=None,
+        description="Langfuse Secret Key"
+    )
+    LANGFUSE_HOST: Optional[str] = Field(
+        default="http://localhost:3001",
+        description="Langfuse Server URL"
+    )
+
     # ==================== Pydantic Settings 配置 ====================
 
     model_config = SettingsConfigDict(

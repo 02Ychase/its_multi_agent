@@ -6,8 +6,30 @@ from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
 from multi_agent.after_sales_agent import after_sales_agent
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
+from services.tool_execution_service import execute_async_tool
+from schemas.tooling import ToolExecutionConfig
 
 from infrastructure.logging.logger import logger
+
+
+# 工具执行治理配置
+TECHNICAL_AGENT_TOOL_CONFIG = ToolExecutionConfig(
+    timeout_seconds=90,
+    max_attempts=1,
+    fallback_message="技术专家暂时不可用，请稍后再试，或先描述设备型号和故障现象。"
+)
+
+SERVICE_AGENT_TOOL_CONFIG = ToolExecutionConfig(
+    timeout_seconds=90,
+    max_attempts=1,
+    fallback_message="服务站与导航查询暂时不可用，请稍后再试，或提供更明确的城市/地址。"
+)
+
+AFTER_SALES_TOOL_CONFIG = ToolExecutionConfig(
+    timeout_seconds=30,
+    max_attempts=1,
+    fallback_message="售后查询暂时不可用，请稍后再试，并确认订单号或工单号是否正确。"
+)
 
 
 # 1. 定义技术专家智能体工具
@@ -26,18 +48,24 @@ async def consult_technical_expert(
     Args:
     query: 用户的原始问题或完整指令。
     """
-    try:
-        logger.info(f"[Route] 转交技术专家: {query[:30]}...")
+    logger.info(f"[Route] 转交技术专家: {query[:30]}...")
 
-        # 直接透传用户指令，不要做任何加工
+    async def _run(query: str):
         result = await Runner.run(
             technical_agent,
             input=query,
             run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
-    except Exception as e:
-        return f"技术专家暂时无法回答: {str(e)}"
+
+    result = await execute_async_tool(
+        tool_name="consult_technical_expert",
+        func=_run,
+        arguments={"query": query},
+        config=TECHNICAL_AGENT_TOOL_CONFIG,
+        agent_name="orchestrator",
+    )
+    return result.output
 
 
 # 2. 定义全能业务智能体工具
@@ -56,16 +84,24 @@ async def query_service_station_and_navigate(
         Args:
             query: 用户的原始问题（包含隐含的位置信息）。
     """
-    try:
-        logger.info(f"[Route] 转交业务专家: {query[:30]}...")
+    logger.info(f"[Route] 转交业务专家: {query[:30]}...")
+
+    async def _run(query: str):
         result = await Runner.run(
             comprehensive_service_agent,
             input=query,
             run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
-    except Exception as e:
-        return f"业务专家暂时无法回答: {str(e)}"
+
+    result = await execute_async_tool(
+        tool_name="query_service_station_and_navigate",
+        func=_run,
+        arguments={"query": query},
+        config=SERVICE_AGENT_TOOL_CONFIG,
+        agent_name="orchestrator",
+    )
+    return result.output
 
 
 # 3. 定义订单售后智能体工具
@@ -86,16 +122,24 @@ async def consult_after_sales_expert(
     Args:
         query: 用户的原始问题或完整指令。
     """
-    try:
-        logger.info(f"[Route] 转交售后专家: {query[:30]}...")
+    logger.info(f"[Route] 转交售后专家: {query[:30]}...")
+
+    async def _run(query: str):
         result = await Runner.run(
             after_sales_agent,
             input=query,
             run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
-    except Exception as e:
-        return f"售后专家暂时无法回答: {str(e)}"
+
+    result = await execute_async_tool(
+        tool_name="consult_after_sales_expert",
+        func=_run,
+        arguments={"query": query},
+        config=AFTER_SALES_TOOL_CONFIG,
+        agent_name="orchestrator",
+    )
+    return result.output
 
 
 # 4. 将三个工具暴露出去

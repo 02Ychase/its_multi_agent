@@ -23,13 +23,13 @@ class UserSessionsRequest(BaseModel):
     """
     获取用户历史会话列表的请求体。
     """
-    user_id: str = Field(description="用户唯一标识符")     # 用于查询该用户的所有会话记录
+    user_id: Optional[str] = Field(description="用户唯一标识符", default=None)  # 已弃用，使用 token 身份
 
 
 class DeleteSessionRequest(BaseModel):
     """
     删除用户会话的请求体。
     """
-    user_id: str = Field(description="用户唯一标识符")
+    user_id: Optional[str] = Field(description="用户唯一标识符", default=None)  # 已弃用，使用 token 身份
     session_id: str = Field(description="要删除的会话ID")
 

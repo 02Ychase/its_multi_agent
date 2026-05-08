@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import Optional
 
-from services.auth_service import register_user, login_user, refresh_access_token, decode_token
+from services.auth_service import register_user, login_user, refresh_access_token, decode_token, logout_user
 from infrastructure.logging.logger import logger
 
 router = APIRouter(prefix="/api/auth", tags=["认证"])
@@ -22,6 +22,10 @@ class LoginRequest(BaseModel):
 
 
 class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class LogoutRequest(BaseModel):
     refresh_token: str
 
 
@@ -83,3 +87,10 @@ async def refresh(request: RefreshRequest):
 async def me(current_user: dict = Depends(get_current_user)):
     """Get current authenticated user info."""
     return {"success": True, "user": current_user}
+
+
+@router.post("/logout", summary="退出登录")
+async def logout(request: LogoutRequest):
+    """Logout and revoke refresh token."""
+    result = logout_user(request.refresh_token)
+    return result

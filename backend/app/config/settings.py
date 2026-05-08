@@ -62,7 +62,7 @@ class Settings(BaseSettings):
         description="通义千问 DashScope Base URL"
     )
     DASHSCOPE_API_KEY: Optional[str] = Field(
-        default="sk-26d57c968c364e7bb14f1fc350d4bff0",
+        default=None,
         description="通义千问 DashScope API Key"
     )
 
@@ -104,6 +104,13 @@ class Settings(BaseSettings):
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = Field(
         default=7,
         description="Refresh Token 有效期（天）"
+    )
+
+    # ==================== CORS 配置 ====================
+
+    CORS_ALLOW_ORIGINS: str = Field(
+        default="http://localhost:5173,http://localhost:3000",
+        description="CORS 允许的来源，逗号分隔"
     )
 
     # ==================== Pydantic Settings 配置 ====================

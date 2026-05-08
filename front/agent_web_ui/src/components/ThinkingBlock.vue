@@ -14,6 +14,7 @@
 import { computed } from 'vue'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   content: String,
@@ -28,7 +29,7 @@ marked.setOptions({ breaks: true, gfm: true })
 
 const renderedContent = computed(() => {
   if (!props.content) return ''
-  try { return marked.parse(props.content) } catch { return props.content }
+  try { return DOMPurify.sanitize(marked.parse(props.content)) } catch { return DOMPurify.sanitize(props.content) }
 })
 </script>
 

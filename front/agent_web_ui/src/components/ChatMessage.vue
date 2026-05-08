@@ -32,6 +32,7 @@
 <script setup>
 import { computed } from 'vue'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import ThinkingBlock from './ThinkingBlock.vue'
 
 const props = defineProps({
@@ -46,7 +47,7 @@ marked.setOptions({ breaks: true, gfm: true })
 
 const renderedContent = computed(() => {
   if (!props.message?.content) return ''
-  try { return marked.parse(props.message.content) } catch { return props.message.content }
+  try { return DOMPurify.sanitize(marked.parse(props.message.content)) } catch { return DOMPurify.sanitize(props.message.content) }
 })
 </script>
 

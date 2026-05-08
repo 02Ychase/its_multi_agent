@@ -53,6 +53,7 @@ import { ref, nextTick } from 'vue'
 import { queryKnowledge } from '@/api/knowledge'
 import { Promotion, ChatDotRound } from '@element-plus/icons-vue'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const input = ref('')
 const loading = ref(false)
@@ -71,7 +72,7 @@ const scrollToBottom = () => {
 
 const formatContent = (text) => {
   if (!text) return ''
-  try { return marked.parse(text) } catch { return text }
+  try { return DOMPurify.sanitize(marked.parse(text)) } catch { return DOMPurify.sanitize(text) }
 }
 
 const handleSend = async () => {

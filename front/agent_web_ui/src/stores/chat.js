@@ -49,7 +49,7 @@ export const useChatStore = defineStore('chat', () => {
       const res = await authFetch(`${API_BASE}/api/user_sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: auth.username })
+        body: JSON.stringify({})
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
@@ -225,7 +225,7 @@ export const useChatStore = defineStore('chat', () => {
       const res = await authFetch(`${API_BASE}/api/delete_session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: auth.username, session_id: sessionId })
+        body: JSON.stringify({ session_id: sessionId })
       })
       const data = await res.json()
       // Regardless of backend response, force refresh from server

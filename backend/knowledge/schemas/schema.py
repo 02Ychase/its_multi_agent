@@ -1,36 +1,46 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
 class UploadResponse(BaseModel):
-    """
-     文件上传的响应数据模型
-    """
-    status:str  # 响应状态
-    message:str # 响应的消息内容
-    file_name:str # 上传的文件名
-    chunks_added:int # 上传文档切分之后的文档块数量
+    status: str
+    message: str
+    file_name: str
+    chunks_added: int
+    document_id: Optional[str] = None
+    duplicate: bool = False
 
+
+class Citation(BaseModel):
+    document_id: Optional[str] = None
+    chunk_id: Optional[str] = None
+    title: Optional[str] = None
+    source_filename: Optional[str] = None
+    chunk_index: Optional[int] = None
+    score: Optional[float] = None
 
 
 class QueryResponse(BaseModel):
-    """
-     查询的响应数据模型
-    """
-    question:str # 用户提问问题
-    answer:str # 模型的回答
+    question: str
+    answer: str
+    citations: List[Citation] = []
+
 
 class QueryRequest(BaseModel):
-    """
-    查询的请求数据模型
-    """
-    question: str  # 用户提问问题
+    question: str
 
 
 class RetrievalResponse(BaseModel):
-    """
-    检索结果的响应数据模型（用于评测）
-    """
     question: str
     contexts: List[str]
 
+
+class DocumentListResponse(BaseModel):
+    total: int
+    documents: List[dict]
+
+
+class DocumentActionResponse(BaseModel):
+    success: bool
+    document_id: str
+    message: str

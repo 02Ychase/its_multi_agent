@@ -64,6 +64,13 @@ logs/
 *.sqlite3-*
 backend/knowledge/chroma_kb1/
 
+# User session data (migrated to MySQL)
+backend/app/user_memories/
+
+# Knowledge service temp and uploaded files
+backend/knowledge/data/tmp/
+backend/knowledge/data/uploaded/
+
 # Temporary files
 tmp/
 temp/
@@ -86,5 +93,15 @@ Desktop.ini
 backend/openai-agents-tutorial/
 
 docs/
+!docs/
+!docs/superpowers/
+!docs/superpowers/specs/
+!docs/superpowers/plans/
+!docs/superpowers/test-plans/
+!docs/superpowers/specs/*.md
+!docs/superpowers/plans/*.md
+!docs/superpowers/test-plans/*.md
 
 logs/
+
+CLAUDE.md

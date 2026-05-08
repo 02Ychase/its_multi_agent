@@ -46,6 +46,17 @@ class Settings(BaseSettings):
     RERANKER_MODEL: str = "BAAI/bge-reranker-v2-m3"
     RERANKER_ENABLED: bool = True
 
+    # Upload validation
+    MAX_UPLOAD_BYTES: int = 20 * 1024 * 1024  # 20MB
+    UPLOAD_ALLOWED_EXTENSIONS: str = ".md,.txt,.docx,.pdf"
+
+    # MySQL configuration
+    MYSQL_HOST: str = os.environ.get("MYSQL_HOST", "localhost")
+    MYSQL_PORT: int = int(os.environ.get("MYSQL_PORT", "3306"))
+    MYSQL_USER: str = os.environ.get("MYSQL_USER", "root")
+    MYSQL_PASSWORD: str = os.environ.get("MYSQL_PASSWORD", "")
+    MYSQL_DATABASE: str = os.environ.get("MYSQL_DATABASE", "its_db")
+
     model_config = SettingsConfigDict(
         env_file=os.path.join(_project_root, ".env"),
         env_file_encoding="utf-8",

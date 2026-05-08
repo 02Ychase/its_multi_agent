@@ -119,6 +119,17 @@ class VectorStoreRepository:
         return self.vector_database.similarity_search_with_score(user_question,top_k)
 
 
+    def delete_by_ids(self, ids: List[str]) -> None:
+        """
+        根据 ID 列表删除向量数据
+        Args:
+            ids: 要删除的向量 ID 列表
+        """
+        if ids:
+            self.vector_database.delete(ids=ids)
+            logger.info(f"已删除 {len(ids)} 个向量")
+
+
 
 
 

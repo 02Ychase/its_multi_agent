@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install backend app dependencies
+        working-directory: backend/app
+        run: python -m pip install -r requirements.txt
+      - name: Ruff backend app
+        working-directory: backend/app
+        run: ruff check .
+      - name: Test backend app
+        working-directory: backend/app
+        env:
+          MAIN_API_KEY: test
+          MAIN_BASE_URL: http://test.local/v1
+          SUB_API_KEY: test
+          SUB_BASE_URL: http://test.local/v1
+          JWT_SECRET_KEY: test-secret-for-ci
+        run: pytest tests -m "not integration" -v
+
+  backend-knowledge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install knowledge dependencies
+        working-directory: backend/knowledge
+        run: python -m pip install -r requirements.txt
+      - name: Ruff knowledge
+        working-directory: backend/knowledge
+        run: ruff check .
+      - name: Test knowledge
+        working-directory: backend/knowledge
+        env:
+          API_KEY: test
+          BASE_URL: http://test.local/v1
+          MODEL: test-model
+          EMBEDDING_API_KEY: test
+          EMBEDDING_BASE_URL: http://test.local/v1
+          EMBEDDING_MODEL: test-embedding
+          HYDE_ENABLED: "false"
+          RERANKER_ENABLED: "false"
+        run: pytest tests -m "not integration" -v
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: Build agent web UI
+        working-directory: front/agent_web_ui
+        run: |
+          npm ci
+          npm run build
+      - name: Build knowledge platform UI
+        working-directory: front/knowlege_platform_ui
+        run: |
+          npm ci
+          npm run build
+
+  docker-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Docker Compose config
+        run: docker compose config

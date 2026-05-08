@@ -32,6 +32,31 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"用户表初始化失败: {str(e)}")
 
+    try:
+        from repositories.chat_session_repository import init_chat_sessions_table
+        from repositories.chat_message_repository import init_chat_messages_table
+        from repositories.agent_event_repository import init_agent_event_tables
+        init_chat_sessions_table()
+        init_chat_messages_table()
+        init_agent_event_tables()
+        logger.info("会话相关表初始化完成")
+    except Exception as e:
+        logger.error(f"会话相关表初始化失败: {str(e)}")
+
+    try:
+        from models.refresh_token import init_refresh_tokens_table
+        init_refresh_tokens_table()
+        logger.info("refresh_tokens表初始化完成")
+    except Exception as e:
+        logger.error(f"refresh_tokens表初始化失败: {str(e)}")
+
+    try:
+        from repositories.tool_call_repository import init_tool_call_logs_table
+        init_tool_call_logs_table()
+        logger.info("tool_call_logs表初始化完成")
+    except Exception as e:
+        logger.error(f"tool_call_logs表初始化失败: {str(e)}")
+
     yield  # 应用运行期间（先别释放mcp链接 去处理请求...）
 
     # 应用关闭时执行
@@ -50,14 +75,15 @@ def create_fast_api() -> FastAPI:
     # 1. 创建FastApi实例,绑定了生命周期事件
     app = FastAPI(title="ITS API", lifespan=lifespan)
 
-    # 2. 处理跨域
+    # 2. 处理跨域 - 使用可配置的来源
+    from config.settings import settings
+    origins = [origin.strip() for origin in settings.CORS_ALLOW_ORIGINS.split(",") if origin.strip()]
     app.add_middleware(
         CORSMiddleware,
-        # CORSMiddleware 会自动拦截后端的响应 并贴上这些标签 Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers
-        allow_origins=["*"],  # 生产环境应限制为特定域名
-        allow_credentials=True,  # cookie(自定义的key value)(user_id)
-        allow_methods=["*"],  # 任意的请求都可以（POST）
-        allow_headers=["*"],  # 请求头中带上自己的信息（token）
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     # 3. 注册各种路由

@@ -14,7 +14,7 @@ from typing import List, Dict, Any
 
 from datasets import Dataset
 from ragas import evaluate
-from ragas.metrics import (
+from ragas.metrics.collections import (
     context_precision,
     context_recall,
     faithfulness,
@@ -47,7 +47,7 @@ async def query_knowledge_service(question: str) -> Dict[str, Any]:
     Returns:
         Dict with answer and contexts
     """
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    async with httpx.AsyncClient(timeout=180.0, trust_env=False) as client:
         # 调用知识库查询接口
         resp = await client.post(
             f"{KNOWLEDGE_API}/query",

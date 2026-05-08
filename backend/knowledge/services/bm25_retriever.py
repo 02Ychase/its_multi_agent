@@ -1,10 +1,14 @@
 import os
 import logging
 import jieba
+from pathlib import Path
 from typing import List
 from rank_bm25 import BM25Okapi
 from langchain_core.documents import Document
 from config.settings import settings
+
+# 支持的文件格式
+SUPPORTED_EXTENSIONS = {'.md', '.txt', '.docx', '.pdf'}
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,9 +27,30 @@ class BM25Retriever:
         self.bm25: BM25Okapi | None = None
         self._build_index()
 
+    def _read_file_content(self, file_path: str) -> str:
+        """根据文件格式读取内容，统一返回纯文本。"""
+        ext = Path(file_path).suffix.lower()
+
+        if ext in ('.md', '.txt'):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read().strip()
+
+        elif ext == '.pdf':
+            from docling.document_converter import DocumentConverter
+            converter = DocumentConverter()
+            result = converter.convert(file_path)
+            return result.document.export_to_markdown().strip()
+
+        elif ext == '.docx':
+            from docling.document_converter import DocumentConverter
+            converter = DocumentConverter()
+            result = converter.convert(file_path)
+            return result.document.export_to_markdown().strip()
+
+        return ""
+
     def _build_index(self):
-        """Build BM25 index from all markdown files in crawl and uploaded directories."""
-        # 扫描 crawl 目录和 uploaded 目录
+        """Build BM25 index from all supported files in crawl and uploaded directories."""
         dirs_to_scan = [
             settings.CRAWL_OUTPUT_DIR,
             os.path.join(settings._project_root, "data", "uploaded"),
@@ -36,16 +61,16 @@ class BM25Retriever:
             if not os.path.exists(scan_dir):
                 continue
 
-            md_files = [f for f in os.listdir(scan_dir) if f.endswith('.md')]
-            for md_file in md_files:
-                file_path = os.path.join(scan_dir, md_file)
+            files = [f for f in os.listdir(scan_dir)
+                     if Path(f).suffix.lower() in SUPPORTED_EXTENSIONS]
+            for file_name in files:
+                file_path = os.path.join(scan_dir, file_name)
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read().strip()
+                    content = self._read_file_content(file_path)
                     if not content:
                         continue
 
-                    title = os.path.splitext(md_file)[0]
+                    title = os.path.splitext(file_name)[0]
                     # Remove numeric prefix like "0004-"
                     if '-' in title:
                         title = title.split('-', 1)[1]

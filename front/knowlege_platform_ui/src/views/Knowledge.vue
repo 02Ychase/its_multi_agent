@@ -2,7 +2,7 @@
   <div class="knowledge-container">
     <div class="page-header">
       <h2>知识库管理</h2>
-      <p class="subtitle">上传和管理知识库文档，支持 .txt、.md、.pdf 格式</p>
+      <p class="subtitle">上传和管理知识库文档，支持 .md、.txt、.docx、.pdf 格式</p>
     </div>
 
     <el-card class="upload-card" shadow="never">
@@ -23,7 +23,7 @@
         <div class="upload-content">
           <el-icon class="upload-icon"><UploadFilled /></el-icon>
           <div class="upload-text">拖拽文件到此处，或 <em>点击上传</em></div>
-          <div class="upload-tip">支持 .txt、.md、.pdf 格式文件</div>
+          <div class="upload-tip">支持 .md、.txt、.docx、.pdf 格式文件</div>
         </div>
       </el-upload>
     </el-card>

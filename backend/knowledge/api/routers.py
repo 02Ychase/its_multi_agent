@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.concurrency import run_in_threadpool
-from services.ingestion.ingestion_processor import IngestionProcessor
+from services.ingestion.ingestion_processor import IngestionProcessor, SUPPORTED_EXTENSIONS
 from schemas.schema import UploadResponse, QueryResponse, QueryRequest
 from services.retrieval_service import RetrievalService
 from services.query_service import QueryService
@@ -29,9 +29,16 @@ async def upload_file(file: UploadFile = File(...)):
     # "0430-联想手机K900常见问题汇总.md"
 
     try:
-        # 0.临时目录
+        # 0. 文件格式校验
+        file_suffix = os.path.splitext(file.filename)[1].lower()
+        if file_suffix not in SUPPORTED_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的文件格式: {file_suffix}，支持的格式: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
+            )
+
+        # 0.1 临时目录
         temp_md_dir = settings.TMP_MD_FOLDER_PATH
-        file_suffix = os.path.splitext(file.filename)[1]
         tmp_md_path = os.path.join(temp_md_dir, file.filename)
         if not os.path.exists(tmp_md_path):
             os.makedirs(temp_md_dir, exist_ok=True)

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from services.ingestion.ingestion_processor import IngestionProcessor, SUPPORTED_EXTENSIONS
-from schemas.schema import UploadResponse, QueryResponse, QueryRequest
+from schemas.schema import UploadResponse, QueryResponse, QueryRequest, RetrievalResponse
 from services.retrieval_service import RetrievalService
 from services.query_service import QueryService
 from config.settings import settings
@@ -118,3 +118,32 @@ async def query(request: QueryRequest):
     except Exception as e:
         logger.error(f"调用查询知识库服务失败:原因:{str(e)}")
         raise HTTPException(status_code=500,detail="服务内部出现异常")
+
+
+@router.post("/retrieval", response_model=RetrievalResponse, summary="检索知识库（返回原始上下文）")
+async def retrieval(request: QueryRequest):
+    """
+    检索知识库，返回原始检索上下文（用于评测）。
+    Args:
+        request: 用户的输入请求
+
+    Returns:
+        RetrievalResponse：检索到的文档上下文列表
+    """
+    try:
+        user_question = request.question
+        if not user_question:
+            raise HTTPException(status_code=500, detail="查询问题不存在")
+
+        retrieval_context = retrieval_service.retrieval(user_question)
+
+        # 提取文档内容
+        contexts = [doc.page_content for doc in retrieval_context]
+
+        return RetrievalResponse(
+            question=user_question,
+            contexts=contexts
+        )
+    except Exception as e:
+        logger.error(f"检索知识库失败:原因:{str(e)}")
+        raise HTTPException(status_code=500, detail="服务内部出现异常")

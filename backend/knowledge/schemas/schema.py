@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 
@@ -24,4 +25,12 @@ class QueryRequest(BaseModel):
     查询的请求数据模型
     """
     question: str  # 用户提问问题
+
+
+class RetrievalResponse(BaseModel):
+    """
+    检索结果的响应数据模型（用于评测）
+    """
+    question: str
+    contexts: List[str]
 

@@ -4,6 +4,27 @@ import { useAuthStore } from './auth'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
+/**
+ * 带自动 token 刷新的 fetch 封装
+ * 遇到 401 时自动尝试 refresh token，成功后重试原请求
+ */
+async function authFetch(url, options = {}) {
+  const auth = useAuthStore()
+  const headers = { ...options.headers, 'Authorization': `Bearer ${auth.accessToken}` }
+
+  let res = await fetch(url, { ...options, headers })
+
+  if (res.status === 401 && auth.refreshToken) {
+    const refreshed = await auth.tryRefreshToken()
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${auth.accessToken}`
+      res = await fetch(url, { ...options, headers })
+    }
+  }
+
+  return res
+}
+
 export const useChatStore = defineStore('chat', () => {
   const chatMessages = ref([])
   const sessions = ref([])
@@ -25,12 +46,9 @@ export const useChatStore = defineStore('chat', () => {
     if (!auth.username) return
     isLoadingSessions.value = true
     try {
-      const res = await fetch(`${API_BASE}/api/user_sessions`, {
+      const res = await authFetch(`${API_BASE}/api/user_sessions`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.accessToken}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: auth.username })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -101,12 +119,9 @@ export const useChatStore = defineStore('chat', () => {
     scrollToBottom()
 
     try {
-      const res = await fetch(`${API_BASE}/api/query`, {
+      const res = await authFetch(`${API_BASE}/api/query`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.accessToken}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: text.trim(),
           context: { user_id: auth.username, session_id: selectedSessionId.value || '' }
@@ -207,12 +222,9 @@ export const useChatStore = defineStore('chat', () => {
   async function deleteSession(sessionId) {
     const auth = useAuthStore()
     try {
-      const res = await fetch(`${API_BASE}/api/delete_session`, {
+      const res = await authFetch(`${API_BASE}/api/delete_session`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.accessToken}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: auth.username, session_id: sessionId })
       })
       const data = await res.json()

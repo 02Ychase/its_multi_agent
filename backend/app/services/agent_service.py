@@ -43,7 +43,7 @@ class MultiAgentService:
             streaming_result = Runner.run_streamed(
                 starting_agent=orchestrator_agent,
                 input=chat_history,
-                max_turns=5,
+                max_turns=10,
                 run_config=RunConfig(tracing_disabled=True)
             )
 

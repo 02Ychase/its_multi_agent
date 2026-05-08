@@ -1,33 +1,17 @@
 import asyncio
-from agents import (
-    Agent,
-    ModelSettings,
-    Runner,
-    handoff,
-)
+from agents import Agent, Runner
 from infrastructure.ai.openai_client import sub_model
-from infrastructure.ai.openai_client import main_model
 from infrastructure.ai.prompt_loader import load_prompt
 from multi_agent.agent_factory import AGENT_TOOLS
-from multi_agent.technical_agent import technical_agent
-from multi_agent.service_agent import comprehensive_service_agent
-from multi_agent.after_sales_agent import after_sales_agent
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
 from contextlib import AsyncExitStack
 
-# 1. 创建主调度智能体（支持 Tool Calling + Handoff 双模式）
+# 1. 创建主调度智能体（纯 Tool Calling 模式，不使用 Handoff）
 orchestrator_agent = Agent(
     name="orchestrator",
     instructions=load_prompt("orchestrator_v2"),
-    # model=main_model,   # 推理模型（ds_r1[1.科学 2.计算 3.需求拆解]） (已推理为主，干活其次【funcation_call】)
-    model=sub_model,      # 通用模型（已干活为主 推理可能有或者都没有）
-    # 直接使用Agent Tools
+    model=sub_model,
     tools=AGENT_TOOLS,
-    handoffs=[
-        handoff(technical_agent),
-        handoff(comprehensive_service_agent),
-        handoff(after_sales_agent),
-    ],
 )
 
 

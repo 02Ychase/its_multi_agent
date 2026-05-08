@@ -1,0 +1,530 @@
+# RAG 检索质量评测用例（100 条）
+# 覆盖知识库全量文档主题，用于评估 Context Precision / Recall / Faithfulness / Answer Relevancy
+
+# ============================================================
+# 一、Windows 系统故障（15 条）
+# ============================================================
+- id: "rag_001"
+  question: "电脑开机之后没有任何反应怎么办"
+  ground_truth: "电脑开机无反应的排查方法：1. 检查电源线是否连接正常，尝试更换电源插座；2. 检查主机电源指示灯是否亮起；3. 尝试释放静电（拔掉电源线长按开机键15秒）；4. 检查内存条是否松动，重新插拔内存；5. 如以上无效，可能是主板或电源故障，建议送修。"
+  expected_source: "开机之后无任何反应"
+
+- id: "rag_002"
+  question: "Windows 7开机蓝屏怎么解决"
+  ground_truth: "Windows 7开机蓝屏的解决方案：1. 记录蓝屏错误代码；2. 尝试进入安全模式（开机按F8）；3. 安全模式下卸载最近安装的软件或驱动；4. 使用系统还原功能恢复到之前的正常状态；5. 检查内存条是否松动或损坏。"
+  expected_source: "开机蓝屏 Windows 7"
+
+- id: "rag_003"
+  question: "Windows XP系统开机出现蓝屏怎么处理"
+  ground_truth: "Windows XP开机蓝屏的处理方法：1. 记录蓝屏错误代码；2. 重启电脑按F8进入安全模式；3. 最后一次正确的配置启动；4. 检查新安装的硬件或软件；5. 使用系统还原或修复安装。"
+  expected_source: "Windows XP 蓝屏"
+
+- id: "rag_004"
+  question: "系统提示登录进程初始化失败怎么办"
+  ground_truth: "登录进程初始化失败的解决方案：该问题可能由系统文件损坏或注册表异常导致。1. 尝试进入安全模式；2. 使用系统还原恢复到之前正常的状态；3. 使用安装光盘进行启动修复；4. 如无法修复，考虑重装系统。"
+  expected_source: "登录进程初始化失败"
+
+- id: "rag_005"
+  question: "Windows 7开机提示group policy client服务未能登录怎么办"
+  ground_truth: "group policy client服务未能登录的解决方法：1. 重启电脑尝试；2. 进入安全模式，运行services.msc检查Group Policy Client服务状态；3. 修改注册表中该服务的Start值为2；4. 如无法解决，使用系统还原。"
+  expected_source: "group policy client 未登录"
+
+- id: "rag_006"
+  question: "Lenovo G470开机黑屏或蓝屏无法进入系统"
+  ground_truth: "Lenovo G470开机黑屏或蓝屏的解决方案：1. 尝试释放静电（拔掉电源和电池，长按开机键30秒）；2. 重新插拔内存条；3. 尝试进入安全模式卸载最近安装的驱动；4. 如独立显卡有问题，尝试切换到集成显卡；5. 如以上无效，建议送修。"
+  expected_source: "G470 黑屏 蓝屏"
+
+- id: "rag_007"
+  question: "Windows 7中删除文件后在回收站找不到怎么办"
+  ground_truth: "Windows 7中删除文件后回收站找不到的原因和解决方法：1. 使用Shift+Delete永久删除的文件不会进入回收站；2. 回收站属性中可能设置了'不将文件移到回收站'；3. 回收站空间不足导致文件被直接删除；4. 可以使用数据恢复软件尝试恢复。"
+  expected_source: "Windows 7 删除文件 回收站"
+
+- id: "rag_008"
+  question: "如何使用U盘安装Windows 7操作系统"
+  ground_truth: "使用U盘安装Windows 7的步骤：1. 准备一个4GB以上的U盘和Windows 7系统镜像文件；2. 使用UltraISO等工具将镜像写入U盘制作启动盘；3. 重启电脑进入BIOS设置U盘为第一启动项；4. 从U盘启动后按照安装向导完成系统安装。"
+  expected_source: "U盘安装Windows 7"
+
+- id: "rag_009"
+  question: "XP和Vista系统下如何清理系统盘"
+  ground_truth: "XP/Vista系统清理系统盘的方法：1. 使用系统自带的磁盘清理工具（右键C盘-属性-磁盘清理）；2. 清理临时文件和缓存；3. 卸载不常用的程序；4. 清空回收站；5. 使用第三方工具如CCleaner深度清理。"
+  expected_source: "清理系统盘"
+
+- id: "rag_010"
+  question: "联想各机型如何升级到Windows 8.1"
+  ground_truth: "联想机型升级Windows 8.1的方法：1. 确认当前系统为Windows 8；2. 通过应用商店免费升级到Windows 8.1；3. 升级前备份重要数据；4. 确保驱动兼容性；5. 升级后检查设备管理器中是否有未识别设备。注意事项：部分老机型可能不支持升级。"
+  expected_source: "升级Windows 8.1"
+
+- id: "rag_011"
+  question: "如何通过应用商店升级到Windows 8.1"
+  ground_truth: "通过应用商店升级到Windows 8.1的步骤：1. 打开Windows应用商店；2. 在首页找到Windows 8.1更新横幅；3. 点击'下载'开始升级；4. 下载完成后系统会提示重启；5. 按照提示完成升级过程。"
+  expected_source: "应用商店 升级 Windows 8.1"
+
+- id: "rag_012"
+  question: "Vista系统下随机软件如何安装与卸载"
+  ground_truth: "Vista系统下软件安装与卸载方法：安装：1. 运行安装程序；2. 按向导提示完成安装。卸载：1. 打开控制面板；2. 点击'程序和功能'；3. 找到要卸载的程序；4. 右键选择'卸载'。"
+  expected_source: "Vista 安装 卸载"
+
+- id: "rag_013"
+  question: "英伟达显卡驱动安全类更新怎么操作"
+  ground_truth: "英伟达显卡驱动安全更新方法：1. 访问NVIDIA官网下载最新驱动；2. 或使用GeForce Experience自动检测更新；3. 下载后运行安装程序；4. 选择'自定义安装'可执行清洁安装；5. 安装完成后重启电脑。"
+  expected_source: "NVIDIA 显卡驱动 更新"
+
+- id: "rag_014"
+  question: "如何在全拼输入法里删除自造字"
+  ground_truth: "删除TrueType造字程序自造字的方法：1. 开始菜单运行eudcedit打开造字程序；2. 选择要删除的字符代码；3. 编辑-删除字符；4. 保存退出。"
+  expected_source: "全拼输入法 自造字 删除"
+
+- id: "rag_015"
+  question: "新圆梦F系列电脑运行游戏卡怎么解决"
+  ground_truth: "联想新圆梦F系列运行游戏卡顿的解决方案：1. 检查显卡驱动是否为最新版本；2. 降低游戏画质设置；3. 关闭后台不必要的程序；4. 检查电脑散热是否正常；5. 如为集成显卡，部分大型游戏可能无法流畅运行。"
+  expected_source: "新圆梦F 游戏卡"
+
+# ============================================================
+# 二、Office 软件问题（15 条）
+# ============================================================
+- id: "rag_016"
+  question: "如何修改Microsoft Word的默认样式"
+  ground_truth: "修改Microsoft Word默认样式的方法：1. 打开Word，点击'开始'选项卡中的'样式'组右下角的对话框启动器；2. 右键点击要修改的样式，选择'修改'；3. 在弹出的对话框中设置字体、段落等格式；4. 勾选'基于该模板的新文档'使其永久生效；5. 点击确定保存。"
+  expected_source: "Microsoft Word 默认样式"
+
+- id: "rag_017"
+  question: "Word中插入的图片变成空白框怎么办"
+  ground_truth: "Word 2010/2007中插入图片变成空白框的解决方法：1. 点击文件-选项-高级；2. 找到'显示文档内容'部分；3. 取消勾选'显示图片框'；4. 或在'草稿和大纲视图中显示图片框'前取消勾选；5. 确定后图片应正常显示。"
+  expected_source: "Word 图片 空白框"
+
+- id: "rag_018"
+  question: "PowerPoint 2007中无法输入中文怎么办"
+  ground_truth: "PowerPoint 2007无法输入中文的解决方法：1. 检查输入法是否切换到中文模式；2. 尝试更换其他中文输入法；3. 修复Office安装（控制面板-程序和功能-Office-更改-修复）；4. 检查Windows语言设置中是否启用了中文。"
+  expected_source: "PowerPoint 中文输入"
+
+- id: "rag_019"
+  question: "Outlook中没有已发送邮件的记录怎么办"
+  ground_truth: "Outlook没有已发送邮件记录的解决方法：1. 检查发送邮件时是否勾选了'保存已发送邮件'选项；2. 文件-选项-邮件-保存消息，确认已勾选'在已发送邮件文件夹中保存邮件副本'；3. 检查已发送邮件文件夹是否被筛选或移动。"
+  expected_source: "Outlook 已发送邮件"
+
+- id: "rag_020"
+  question: "如何去掉Outlook中的段落标记等符号"
+  ground_truth: "去掉Outlook段落标记的方法：1. 在邮件编辑窗口点击'设置文本格式'选项卡；2. 找到'段落'组中的显示/隐藏标记按钮（¶符号）；3. 点击取消即可隐藏段落标记；4. 或通过文件-选项-邮件-编辑器选项-显示，取消'段落标记'。"
+  expected_source: "Outlook 段落标记"
+
+- id: "rag_021"
+  question: "Excel文件菜单及相关功能灰色不可用怎么办"
+  ground_truth: "Excel文件菜单灰色不可用的解决方法：1. 检查文件是否以只读方式打开；2. 检查工作簿是否受保护（审阅-撤销工作表保护）；3. 检查是否处于单元格编辑状态（按Esc退出）；4. 尝试以安全模式启动Excel排除加载项冲突。"
+  expected_source: "Excel 菜单 灰色"
+
+- id: "rag_022"
+  question: "如何删除Excel中的打印线"
+  ground_truth: "删除Excel打印线（分页符虚线）的方法：1. 点击文件-选项-高级；2. 找到'此工作表的显示选项'；3. 取消勾选'显示分页符'；4. 确定即可隐藏打印线。"
+  expected_source: "Excel 打印线 删除"
+
+- id: "rag_023"
+  question: "Excel显示#VALUE!错误信息怎么解决"
+  ground_truth: "Excel显示#VALUE!错误的原因和解决方法：#VALUE!错误通常表示公式中使用了错误的数据类型。1. 检查公式中的单元格是否包含文本而非数字；2. 检查数组公式是否正确输入（需按Ctrl+Shift+Enter）；3. 检查函数参数是否正确；4. 使用VALUE函数将文本转换为数字。"
+  expected_source: "Excel #VALUE! 错误"
+
+- id: "rag_024"
+  question: "Excel表导入Access 2010后时间显示错误怎么办"
+  ground_truth: "Excel导入Access后时间显示错误的解决方法：1. 检查Excel中时间列的格式是否正确；2. 在Access中修改字段类型为日期/时间型；3. 导入时使用导入向导手动指定每列的数据类型；4. 如仍有问题，先将Excel另存为CSV再导入。"
+  expected_source: "Excel Access 时间错误"
+
+- id: "rag_025"
+  question: "Excel中如何实现index函数自动更新"
+  ground_truth: "Excel中INDEX函数自动更新的方法：1. 确保引用的数据源区域正确；2. 使用OFFSET或INDIRECT函数配合INDEX实现动态引用；3. 设置工作簿自动计算（公式-计算选项-自动）；4. 如使用VBA，可在Worksheet_Change事件中触发重算。"
+  expected_source: "Excel index函数 自动更新"
+
+- id: "rag_026"
+  question: "为何Excel中的宏内容无法正常显示"
+  ground_truth: "Excel宏内容无法显示的解决方法：1. 检查宏安全性设置（文件-选项-信任中心-信任中心设置-宏设置）；2. 选择'启用所有宏'或'禁用无数字签署的所有宏'；3. 确保文件保存为.xlsm格式（启用宏的工作簿）；4. 检查VBA编辑器中宏代码是否完整。"
+  expected_source: "Excel 宏 无法显示"
+
+- id: "rag_027"
+  question: "为何使用Hyperlink函数创建目录时提示引用无效"
+  ground_truth: "Hyperlink函数创建目录提示引用无效的原因：1. 工作表名称中包含特殊字符需要用单引号括起来；2. 引用的单元格地址格式不正确；3. 目标工作表不存在或已被重命名。解决方法：确保公式格式为=HYPERLINK('#Sheet1!A1','链接文字')。"
+  expected_source: "Hyperlink 引用无效"
+
+- id: "rag_028"
+  question: "如何在Project 2010中把甘特图复制到Word文档"
+  ground_truth: "在Project 2010中复制甘特图到Word的方法：1. 在Project中调整甘特图视图到合适显示范围；2. 任务选项卡-复制-复制图片；3. 选择'按屏幕显示'或'按打印尺寸'；4. 打开Word文档粘贴即可。"
+  expected_source: "Project 甘特图 Word"
+
+- id: "rag_029"
+  question: "Visio 2010形状面板不见了怎么恢复"
+  ground_truth: "Visio 2010形状面板恢复方法：1. 点击菜单栏'视图'；2. 选择'形状窗口'重新显示；3. 如仍不见，尝试重置工作区（工具-选项-重置）；4. 或通过文件-形状-选择需要的模具。"
+  expected_source: "Visio 形状面板"
+
+- id: "rag_030"
+  question: "如何在OneNote中输入复杂的数学公式"
+  ground_truth: "在OneNote 2010/2007中输入复杂数学公式的方法：1. 点击'插入'选项卡；2. 选择'公式'；3. 使用公式工具设计数学符号和结构；4. 也可以使用墨迹公式功能手写公式自动识别。"
+  expected_source: "OneNote 数学公式"
+
+# ============================================================
+# 三、IE 浏览器 / 网络问题（12 条）
+# ============================================================
+- id: "rag_031"
+  question: "Internet Explorer下载完成后不弹出提示框怎么办"
+  ground_truth: "IE下载完成不弹提示框的解决方法：1. 检查IE设置-查看下载，确认下载完成通知设置；2. 检查是否被弹窗拦截器阻止；3. 重置IE设置（Internet选项-高级-重置）；4. 检查安全软件是否拦截了下载通知。"
+  expected_source: "Internet Explorer 下载 提示框"
+
+- id: "rag_032"
+  question: "如何控制Internet Explorer浏览器的进程数量"
+  ground_truth: "控制IE浏览器进程数量的方法：1. 在注册表中定位到HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\Main；2. 新建DWORD值TabProcGrowth；3. 设置值为0表示单进程，1表示每标签页独立进程；4. 重启IE生效。"
+  expected_source: "Internet Explorer 进程数量"
+
+- id: "rag_033"
+  question: "IE浏览器打开网页时页面错乱怎么办"
+  ground_truth: "IE打开网页页面错乱的解决方法：1. 检查IE版本是否过低，升级到最新版本；2. 清除浏览器缓存和Cookie；3. 检查兼容性视图设置；4. 禁用不必要的加载项；5. 重置IE设置。"
+  expected_source: "IE 页面错乱"
+
+- id: "rag_034"
+  question: "IE浏览器无法启用JavaScript怎么办"
+  ground_truth: "IE无法启用JavaScript的解决方法：1. Internet选项-安全-自定义级别；2. 找到'脚本'-'活动脚本'选择'启用'；3. 同时启用'Java小程序脚本'；4. 确定后重启IE。"
+  expected_source: "IE JavaScript 启用"
+
+- id: "rag_035"
+  question: "IE浏览器只能打开首页无法打开其他链接怎么解决"
+  ground_truth: "IE只能打开首页无法打开链接的解决方法：1. 检查默认浏览器设置；2. 重置IE设置（Internet选项-高级-重置）；3. 重新注册IE组件（管理员运行cmd，执行regsvr32 urlmon.dll等）；4. 检查hosts文件是否被篡改。"
+  expected_source: "IE 只能打开首页"
+
+- id: "rag_036"
+  question: "IE浏览器页面停止响应并提示关闭程序怎么处理"
+  ground_truth: "IE 9页面停止响应的解决方法：1. 禁用不必要的加载项（工具-管理加载项）；2. 清除浏览器缓存；3. 关闭加速的图形渲染（Internet选项-高级-使用软件渲染）；4. 更新显卡驱动；5. 重置IE设置。"
+  expected_source: "IE 停止响应"
+
+- id: "rag_037"
+  question: "无法在IE中打印或查看网页的打印预览怎么办"
+  ground_truth: "IE无法打印或查看打印预览的解决方法：1. 检查打印机驱动是否正常；2. 重置IE安全设置为默认级别；3. 在Internet选项-高级中勾选'启用增强保护模式'的反选项；4. 以管理员身份运行IE。"
+  expected_source: "IE 打印预览"
+
+- id: "rag_038"
+  question: "QQ可以登录但网页打不开或者很慢怎么解决"
+  ground_truth: "QQ能登录但网页打不开的解决方法：1. 检查DNS设置（设置为114.114.114.114或8.8.8.8）；2. 清除DNS缓存（cmd执行ipconfig /flushdns）；3. 检查代理设置是否正确；4. 重置Winsock（cmd执行netsh winsock reset）；5. 检查hosts文件。"
+  expected_source: "QQ 网页打不开"
+
+- id: "rag_039"
+  question: "宽带连接频繁掉线怎么解决"
+  ground_truth: "宽带频繁掉线的解决方法：1. 检查电话线/网线接口是否松动；2. 检查分离器是否正确连接；3. 重启Modem和路由器；4. 检查网卡驱动是否需要更新；5. 联系运营商检查线路质量。"
+  expected_source: "宽带连接频繁掉线"
+
+- id: "rag_040"
+  question: "设置正确的DNS解决上网慢的问题"
+  ground_truth: "通过设置DNS解决上网慢的方法：1. 打开网络和共享中心-更改适配器设置；2. 右键网络连接-属性；3. 选择Internet协议版本4-属性；4. 使用下面的DNS服务器地址：首选114.114.114.114，备用8.8.8.8；5. 确定后刷新DNS缓存。"
+  expected_source: "DNS 上网慢"
+
+- id: "rag_041"
+  question: "如何解决ADSL上网慢的故障"
+  ground_truth: "ADSL上网慢的解决方法：1. 检查电话线质量，排除线路干扰；2. 检查分离器连接是否正确；3. 重启Modem；4. 检查网线是否为Cat5e以上标准；5. 联系运营商检查线路信号质量；6. 排查局域网内是否有设备占用大量带宽。"
+  expected_source: "ADSL 上网慢"
+
+- id: "rag_042"
+  question: "为何卸载99宿舍网查询加密锁后IE无法上网"
+  ground_truth: "卸载99宿舍网查询加密锁后IE无法上网的原因：该软件可能修改了网络设置或LSP。解决方法：1. 重置Winsock（cmd执行netsh winsock reset）；2. 重置IE设置；3. 检查代理设置是否被修改；4. 重新安装网络驱动。"
+  expected_source: "99宿舍网 IE无法上网"
+
+# ============================================================
+# 四、手机 / 平板问题（15 条）
+# ============================================================
+- id: "rag_043"
+  question: "联想手机如何恢复出厂设置"
+  ground_truth: "联想手机恢复出厂设置的方法：1. 进入设置-备份和重置；2. 选择'恢复出厂设置'；3. 确认清除所有数据；4. 手机将自动重启并恢复。注意：恢复前请备份重要数据，此操作会清除所有用户数据。"
+  expected_source: "联想手机 恢复出厂设置"
+
+- id: "rag_044"
+  question: "手机如何恢复已经删除的内置软件"
+  ground_truth: "手机恢复已删除内置软件的方法：1. 进入设置-应用管理；2. 查看是否有'已停用'或'已卸载'的系统应用；3. 选择需要恢复的应用点击'启用'；4. 如已完全卸载，可能需要恢复出厂设置或刷机恢复。"
+  expected_source: "手机 恢复 内置软件"
+
+- id: "rag_045"
+  question: "手机自动拨打电话怎么解决"
+  ground_truth: "手机自动拨打电话的解决方法：1. 检查是否误触了拨号快捷方式；2. 清除拨号应用的缓存和数据；3. 检查是否有第三方应用获得了拨号权限；4. 进入安全模式排查是否为第三方应用导致；5. 如仍无法解决，备份后恢复出厂设置。"
+  expected_source: "手机 自动拨打"
+
+- id: "rag_046"
+  question: "手机或平板电脑无法访问百度相关网站怎么办"
+  ground_truth: "手机或平板无法访问百度的解决方法：1. 检查网络连接是否正常；2. 清除浏览器缓存和Cookie；3. 尝试更换DNS服务器（如114.114.114.114）；4. 检查是否安装了安全软件拦截了百度域名；5. 尝试使用其他浏览器访问。"
+  expected_source: "手机 平板 无法访问百度"
+
+- id: "rag_047"
+  question: "如何将手机文件资料移至外置存储卡"
+  ground_truth: "将手机文件移至外置存储卡的方法：1. 进入文件管理器；2. 选择要移动的文件或文件夹；3. 点击移动或复制；4. 选择外置SD卡作为目标位置；5. 也可以连接电脑通过USB直接拖拽文件到SD卡。"
+  expected_source: "手机文件 外置存储卡"
+
+- id: "rag_048"
+  question: "手机改善系统空间不足的方法"
+  ground_truth: "手机系统空间不足的改善方法：1. 清除应用缓存（设置-应用管理-选择应用-清除缓存）；2. 卸载不常用的第三方应用；3. 将应用移至SD卡（如支持）；4. 清理下载文件夹和临时文件；5. 使用系统自带的存储清理工具。"
+  expected_source: "手机 系统空间不足"
+
+- id: "rag_049"
+  question: "改善手机或平板机身发热的办法"
+  ground_truth: "改善手机平板发热的方法：1. 避免边充电边使用；2. 关闭不必要的后台应用；3. 降低屏幕亮度；4. 关闭GPS、蓝牙等不用的功能；5. 避免在高温环境下使用；6. 如持续异常发热，可能是电池问题，建议送修。"
+  expected_source: "手机 平板 发热"
+
+- id: "rag_050"
+  question: "手机使用中个人安全隐私如何保障"
+  ground_truth: "手机个人隐私安全保障方法：1. 设置锁屏密码或指纹解锁；2. 不安装来源不明的应用；3. 定期检查应用权限设置；4. 开启查找手机功能；5. 不在公共WiFi下进行敏感操作；6. 定期备份重要数据。"
+  expected_source: "手机 安全隐私"
+
+- id: "rag_051"
+  question: "手机丢失后造成的信息泄露如何预防"
+  ground_truth: "手机丢失后预防信息泄露的方法：1. 立即远程锁定手机（使用查找手机功能）；2. 远程清除手机数据；3. 挂失SIM卡；4. 修改所有重要账号密码（银行、社交、邮箱）；5. 通知亲友防止诈骗；6. 报警处理。"
+  expected_source: "手机丢失 信息泄露"
+
+- id: "rag_052"
+  question: "联想手机如何查询产品型号"
+  ground_truth: "联想手机查询产品型号的方法：1. 进入设置-关于手机；2. 查看'型号'一栏即为手机型号；3. 也可以查看手机背面或电池仓内的标签；4. 拨号界面输入*#06#可查看IMEI号。"
+  expected_source: "联想手机 查询型号"
+
+- id: "rag_053"
+  question: "联想手机如何更换桌面墙纸"
+  ground_truth: "联想手机更换桌面墙纸的方法：1. 长按桌面空白处；2. 选择'壁纸'或'桌面设置'；3. 可选择静态墙纸、动态墙纸或锁屏墙纸；4. 从图库或系统壁纸中选择；5. 裁剪后确认设置。"
+  expected_source: "联想手机 桌面墙纸"
+
+- id: "rag_054"
+  question: "联想手机如何添加和删除窗口小部件"
+  ground_truth: "联想手机添加/删除窗口小部件的方法：添加：1. 长按桌面空白处；2. 选择'小部件'；3. 长按要添加的小部件拖动到桌面。删除：长按小部件拖动到'移除'区域。"
+  expected_source: "联想手机 窗口小部件"
+
+- id: "rag_055"
+  question: "联想手机如何在桌面上添加文件夹"
+  ground_truth: "联想手机在桌面添加文件夹的方法：1. 长按一个应用图标；2. 拖动到另一个应用图标上方；3. 系统会自动创建文件夹；4. 点击文件夹可重命名；5. 也可长按桌面空白处-文件夹来创建。"
+  expected_source: "联想手机 桌面文件夹"
+
+- id: "rag_056"
+  question: "联想手机如何在自带浏览器删除历史记录"
+  ground_truth: "联想手机自带浏览器删除历史记录的方法：1. 打开自带浏览器；2. 点击菜单键或右下角菜单图标；3. 选择'设置'或'隐私'；4. 点击'清除浏览数据'；5. 勾选'浏览历史记录'后确认清除。"
+  expected_source: "联想手机 浏览器 历史记录"
+
+- id: "rag_057"
+  question: "手机如何通过数据线连接电脑实现U盘功能"
+  ground_truth: "手机通过数据线连接电脑实现U盘功能：1. 用数据线连接手机和电脑；2. 手机下拉通知栏-USB连接方式；3. 选择'MTP'或'大容量存储'模式；4. 电脑上即可看到手机存储盘符；5. 可直接复制粘贴文件。"
+  expected_source: "手机 数据线 U盘"
+
+# ============================================================
+# 五、驱动 / 硬件问题（10 条）
+# ============================================================
+- id: "rag_058"
+  question: "Lenovo G485 USB3.0驱动程序安装不上怎么解决"
+  ground_truth: "Lenovo G485 USB3.0驱动安装不上的解决方法：1. 确认下载的驱动与操作系统版本匹配；2. 以管理员身份运行安装程序；3. 先卸载旧版本驱动再安装新版本；4. 检查Windows Update是否有可用驱动更新；5. 尝试手动指定驱动路径安装。"
+  expected_source: "G485 USB3.0 驱动"
+
+- id: "rag_059"
+  question: "Lenovo G485亮度无法调节怎么解决"
+  ground_truth: "Lenovo G485亮度无法调节的解决方案：1. 安装或更新显卡驱动；2. 安装电源管理驱动（Energy Management）；3. 检查快捷键驱动是否安装；4. 尝试在电源选项中调节屏幕亮度；5. 如以上无效，可能是硬件问题，建议送修。"
+  expected_source: "G485 亮度 无法调节"
+
+- id: "rag_060"
+  question: "联想G470笔记本亮度无法调节怎么办"
+  ground_truth: "联想G470亮度无法调节的解决方案：1. 安装联想电源管理驱动；2. 更新显卡驱动到最新版本；3. 使用Fn+亮度快捷键调节；4. 在控制面板-电源选项中调节；5. 检查是否有Windows更新影响了驱动。"
+  expected_source: "G470 亮度 无法调节"
+
+- id: "rag_061"
+  question: "Lenovo G480数字键盘怎么开启和关闭"
+  ground_truth: "Lenovo G480数字键盘开启和关闭的方法：1. 按Fn+NumLock键切换数字键盘的开关状态；2. 开启后右侧字母键会变为数字输入；3. 如NumLock指示灯亮表示数字键盘已开启；4. 部分机型可能需要安装热键驱动才能使用。"
+  expected_source: "G480 数字键盘"
+
+- id: "rag_062"
+  question: "Lenovo G485在XP系统下无法使用独显怎么办"
+  ground_truth: "Lenovo G485在XP下无法使用独显的解决方法：1. 确认该机型在XP下是否有独立显卡驱动支持；2. 安装对应的显卡驱动；3. 检查BIOS中显卡切换设置；4. 部分双显卡机型在XP下可能仅支持集成显卡。"
+  expected_source: "G485 XP 独显"
+
+- id: "rag_063"
+  question: "Lenovo G485无线网络连接不上怎么解决"
+  ground_truth: "Lenovo G485无线网络连接不上的解决方法：1. 检查无线网卡开关是否打开（Fn+F5或物理开关）；2. 更新无线网卡驱动；3. 检查路由器设置和信号强度；4. 忘记已保存的WiFi重新连接；5. 重置网络设置。"
+  expected_source: "G485 无线网络"
+
+- id: "rag_064"
+  question: "昭阳K43 E43系列机型只使用电池时找不到网络设备怎么办"
+  ground_truth: "昭阳K43/E43只使用电池找不到网络设备的解决方法：该问题可能是电源管理策略在电池模式下关闭了网络设备。1. 进入电源管理设置；2. 将电池模式下的网络设备设置为'最高性能'；3. 更新电源管理驱动。"
+  expected_source: "昭阳K43 E43 电池 网络"
+
+- id: "rag_065"
+  question: "商用选件如何查询编号"
+  ground_truth: "商用选件查询编号的方法：1. 查看选件包装上的标签；2. 在联想官网支持页面输入主机编号查询兼容选件；3. 使用联想自动检测工具识别已安装的选件；4. 联系联想客服提供主机型号查询。"
+  expected_source: "商用选件 查询编号"
+
+- id: "rag_066"
+  question: "Lenovo IdeaCentre Horizon 27怎么使用"
+  ground_truth: "Lenovo IdeaCentre Horizon 27快速使用指南：1. 该机为27寸一体机/平板两用设备；2. 支持十点触控和多用户同时操作；3. 内置电池可脱离电源使用；4. 配有专用支架可调节角度；5. 预装Lenovo Aura交互界面。"
+  expected_source: "IdeaCentre Horizon 27"
+
+- id: "rag_067"
+  question: "联想各机型升级Windows 8.1的注意事项有哪些"
+  ground_truth: "联想机型升级Windows 8.1的注意事项：1. 备份重要数据；2. 确保电源充足或连接电源；3. 检查驱动兼容性，特别是显卡和网卡驱动；4. 升级前更新BIOS到最新版本；5. 部分预装应用可能需要重新安装；6. 升级后检查设备管理器。"
+  expected_source: "升级Windows 8.1 注意事项"
+
+# ============================================================
+# 六、系统操作 / 恢复（10 条）
+# ============================================================
+- id: "rag_068"
+  question: "联想一键恢复怎么使用"
+  ground_truth: "联想一键恢复的使用方法：1. 关机状态下按下一键恢复按钮（部分机型为Novo键）；2. 选择System Recovery进入恢复界面；3. 选择恢复方式：从初始备份恢复或从用户备份恢复；4. 确认后开始恢复，过程中不要断电；5. 恢复完成后系统会自动重启。注意：恢复会清除C盘数据。"
+  expected_source: "联想一键恢复"
+
+- id: "rag_069"
+  question: "联想手机A298t如何恢复出厂设置"
+  ground_truth: "联想手机A298t恢复出厂设置的方法：1. 进入设置-隐私权；2. 选择'恢复出厂设置'；3. 确认操作；4. 手机将自动重启并清除所有数据。注意操作前备份重要数据。"
+  expected_source: "A298t 恢复出厂设置"
+
+- id: "rag_070"
+  question: "联想手机A788t系统固件如何升级"
+  ground_truth: "联想手机A788t系统固件升级方法：1. 进入设置-关于手机-系统更新；2. 检查是否有可用更新；3. 下载更新包；4. 确认安装，手机将自动重启完成升级；5. 也可从联想官网下载固件包手动刷机。"
+  expected_source: "A788t 固件升级"
+
+- id: "rag_071"
+  question: "联想手机A765e系统固件如何升级"
+  ground_truth: "联想手机A765e系统固件升级方法：1. 进入设置-关于手机-系统更新检查更新；2. 下载并安装更新；3. 手动升级可从联想官网下载对应固件包；4. 将固件包放入SD卡根目录；5. 关机后同时按住音量+和电源键进入Recovery模式刷机。"
+  expected_source: "A765e 固件升级"
+
+- id: "rag_072"
+  question: "联想手机S650系统固件如何升级"
+  ground_truth: "联想手机S650系统固件升级方法：1. 设置-关于手机-系统更新检查OTA更新；2. 如有更新下载安装即可；3. 手动升级需从联想社区或官网下载固件；4. 放入SD卡后通过Recovery模式刷入。"
+  expected_source: "S650 固件升级"
+
+- id: "rag_073"
+  question: "联想手机S960最新系统固件版本是什么"
+  ground_truth: "联想手机S960最新系统固件版本信息：请访问联想官方支持网站，输入机型S960查询最新固件版本号和更新日志。也可在手机设置-关于手机中查看当前版本号与官方最新版本对比。"
+  expected_source: "S960 固件版本"
+
+- id: "rag_074"
+  question: "联想手机A788t系统固件最新版本是什么"
+  ground_truth: "联想手机A788t系统固件最新版本信息：请访问联想官方支持网站查询A788t的最新固件版本。在手机设置-关于手机-版本信息中可查看当前版本号。"
+  expected_source: "A788t 固件版本"
+
+- id: "rag_075"
+  question: "联想VIBE手机ROM有什么特色功能"
+  ground_truth: "联想VIBE手机ROM的特色功能包括：1. VIBE UI定制界面；2. 智能手势操作；3. 主题商店；4. 安全中心；5. 乐商店应用市场；6. 多种锁屏方式；7. 智能通话功能等。具体功能因机型和ROM版本而异。"
+  expected_source: "VIBE ROM 特色功能"
+
+- id: "rag_076"
+  question: "Windows Phone日历如何设置"
+  ground_truth: "Windows Phone日历相关设置：1. 打开日历应用；2. 点击设置可配置日历账户同步；3. 可添加多个账户的日历（Outlook、Google等）；4. 可设置日历提醒和显示方式；5. 支持月视图、周视图、日视图切换。"
+  expected_source: "Windows Phone 日历"
+
+- id: "rag_077"
+  question: "如何使用Windows Phone的IE浏览器打开多个页面并互相切换"
+  ground_truth: "Windows Phone IE浏览器多页面切换方法：1. 打开IE浏览器；2. 点击底部菜单栏的标签页图标（方块叠放图标）；3. 点击+号打开新标签页；4. 在标签页列表中点击切换不同页面；5. 可左右滑动切换。"
+  expected_source: "Windows Phone IE 多页面"
+
+# ============================================================
+# 七、通讯 / 协作软件（8 条）
+# ============================================================
+- id: "rag_078"
+  question: "如何设置开机自动登录Lync"
+  ground_truth: "设置开机自动登录Lync的方法：1. 打开Lync客户端；2. 点击工具-选项；3. 在'个人'选项卡中勾选'自动启动Lync'；4. 勾选'保存我的密码'实现自动登录；5. 确定保存设置。"
+  expected_source: "Lync 自动登录"
+
+- id: "rag_079"
+  question: "在Lync中如何共享桌面和PPT"
+  ground_truth: "在Lync中共享桌面和PPT的方法：1. 在通话或会议中点击'共享'按钮；2. 选择'共享桌面'可共享整个屏幕；3. 选择'共享程序'可只共享特定应用；4. 共享PowerPoint时选择'共享PowerPoint文件'；5. 参与者可同步查看演示文稿。"
+  expected_source: "Lync 共享桌面 PPT"
+
+- id: "rag_080"
+  question: "如何跟Lync联系人预定会议"
+  ground_truth: "在Lync中预定会议的方法：1. 打开Outlook；2. 新建会议请求；3. 添加Lync联系人为参会者；4. 点击'联机会议'按钮生成会议链接；5. 设置会议时间发送邀请。"
+  expected_source: "Lync 预定会议"
+
+- id: "rag_081"
+  question: "Outlook下如何查看对话历史记录"
+  ground_truth: "在Outlook中查看对话历史记录的方法：1. 打开Outlook；2. 在左侧文件夹列表中找到'对话历史记录'文件夹；3. 点击展开可查看所有Lync/Teams对话记录；4. 可按日期或联系人筛选。"
+  expected_source: "Outlook 对话历史记录"
+
+- id: "rag_082"
+  question: "将Outlook设为Mac默认程序后为何仍弹出Apple Mail"
+  ground_truth: "Mac上Outlook设为默认后仍弹出Apple Mail的原因：1. 需要在系统偏好设置中更改默认邮件程序；2. 打开Apple Mail-偏好设置-通用；3. 将'默认电子邮件阅读程序'改为Microsoft Outlook；4. 重启应用生效。"
+  expected_source: "Outlook Mac Apple Mail"
+
+- id: "rag_083"
+  question: "如何将Visio中的自定义工具命令同步到其它机器"
+  ground_truth: "将Visio自定义工具同步到其他机器的方法：1. 文件-选项-自定义功能区；2. 点击'导入/导出'-'导出所有自定义设置'；3. 保存为.exportedUI文件；4. 在其他机器上同样位置选择'导入自定义文件'。"
+  expected_source: "Visio 自定义工具 同步"
+
+- id: "rag_084"
+  question: "如何删除Access 2010对不存在窗体的引用"
+  ground_truth: "删除Access中不存在窗体引用的方法：1. 打开VBA编辑器（Alt+F11）；2. 在项目资源管理器中选择该数据库；3. 工具-引用；4. 找到标记为'MISSING'的引用；5. 取消勾选后确定保存。"
+  expected_source: "Access 引用 删除"
+
+- id: "rag_085"
+  question: "如何阻止Visio 2010的自动对位"
+  ground_truth: "阻止Visio 2010自动对位的方法：1. 视觉-取消勾选'对齐和粘合'；2. 或在'对齐和粘合'设置中取消不需要的对齐选项；3. 按住Alt键拖动可临时跳过对齐。"
+  expected_source: "Visio 自动对位"
+
+# ============================================================
+# 八、联想智能电视（3 条）
+# ============================================================
+- id: "rag_086"
+  question: "联想智能电视有什么特点"
+  ground_truth: "联想智能电视的特点包括：1. 搭载Android智能系统；2. 支持语音控制和手势操作；3. 内置应用商店可安装第三方应用；4. 支持多屏互动（手机/平板投屏）；5. 三明治UI界面设计；6. 支持体感游戏。"
+  expected_source: "联想智能电视 特点"
+
+- id: "rag_087"
+  question: "联想智能电视与有线电视数字电视有什么区别"
+  ground_truth: "联想智能电视与有线/数字电视的区别：1. 智能电视可联网安装应用，有线电视只能收看频道节目；2. 智能电视支持点播、回看，有线电视为实时播放；3. 智能电视可连接游戏手柄、键盘等外设；4. 智能电视支持手机投屏等互动功能。"
+  expected_source: "智能电视 有线电视 区别"
+
+- id: "rag_088"
+  question: "如何在Windows Phone中查看后台任务"
+  ground_truth: "在Windows Phone中查看后台任务的方法：1. 长按返回键（←）；2. 屏幕会显示所有正在运行的应用卡片；3. 左右滑动浏览；4. 点击某个卡片可切换到该应用；5. 点击卡片上的X可关闭该应用。"
+  expected_source: "Windows Phone 后台任务"
+
+# ============================================================
+# 九、边界 / 负面测试（12 条）
+# 知识库中无答案的问题，期望模型回答"未找到"
+# ============================================================
+- id: "rag_089"
+  question: "如何修理自行车链条"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。知识库主要覆盖电脑技术支持、Office软件、手机平板、网络故障等IT相关问题。"
+  expected_source: "无"
+
+- id: "rag_090"
+  question: "怎么做红烧肉"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。知识库主要覆盖IT技术支持领域，不包含烹饪食谱类内容。"
+  expected_source: "无"
+
+- id: "rag_091"
+  question: "今天的股票行情怎么样"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。实时股票行情需要联网查询，知识库主要存储技术文档。"
+  expected_source: "无"
+
+- id: "rag_092"
+  question: "如何申请美国签证"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。签证申请属于出行服务领域，不在知识库覆盖范围内。"
+  expected_source: "无"
+
+- id: "rag_093"
+  question: "Python怎么实现快速排序算法"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。编程技术问题不在本知识库覆盖范围内，知识库主要面向电脑硬件和软件使用问题。"
+  expected_source: "无"
+
+- id: "rag_094"
+  question: "附近哪里有联想维修站"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。服务站查询属于线下服务导航功能，请使用服务站查询功能获取维修点信息。"
+  expected_source: "无"
+
+- id: "rag_095"
+  question: "联想笔记本最新款多少钱"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。产品价格信息不在知识库范围内，建议访问联想官网商城查询最新价格。"
+  expected_source: "无"
+
+- id: "rag_096"
+  question: "如何预约联想售后服务"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。售后服务预约属于工单系统功能，请联系联想客服或访问官网进行预约。"
+  expected_source: "无"
+
+- id: "rag_097"
+  question: "12306怎么买火车票"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。购票问题不属于IT技术支持范围。"
+  expected_source: "无"
+
+- id: "rag_098"
+  question: "怎么治疗感冒"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。医疗健康问题不在知识库覆盖范围内，请咨询专业医生。"
+  expected_source: "无"
+
+- id: "rag_099"
+  question: "联想公司什么时候成立的"
+  ground_truth: "当前的知识库中暂时没有找到该问题的解决方案。公司信息查询不在知识库覆盖范围内，建议访问联想官网了解公司历史。"
+  expected_source: "无"
+
+- id: "rag_100"
+  question: "这个知识库里有什么内容"
+  ground_truth: "知识库主要包含以下内容：1. Windows系统故障排查（蓝屏、死机、开不了机等）；2. Office软件使用问题（Word、Excel、PowerPoint、Outlook等）；3. IE浏览器和网络故障；4. 联想手机/平板使用技巧；5. 驱动和硬件问题；6. 系统恢复和升级操作。"
+  expected_source: "无"

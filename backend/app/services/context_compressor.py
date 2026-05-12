@@ -3,11 +3,11 @@
 将超出滑动窗口的历史消息用 LLM 压缩为摘要。
 """
 
-from typing import List, Dict, Any
-from infrastructure.ai.openai_client import sub_model_client
-from config.settings import settings
-from infrastructure.logging.logger import logger
+from typing import Any
 
+from config.settings import settings
+from infrastructure.ai.openai_client import sub_model_client
+from infrastructure.logging.logger import logger
 
 SUMMARY_PROMPT = """请用中文将以下对话历史压缩为一段简洁的摘要（不超过200字）。
 重点保留：
@@ -25,9 +25,9 @@ SUMMARY_PROMPT = """请用中文将以下对话历史压缩为一段简洁的摘
 
 
 async def compress_history(
-    messages: List[Dict[str, Any]],
+    messages: list[dict[str, Any]],
     keep_recent: int = 3,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     压缩对话历史：保留最近 keep_recent 轮 + 将更早的对话压缩为摘要。
 

@@ -2,8 +2,9 @@
 初始化售后相关的示例数据。
 运行方式: cd backend/app && python scripts/init_after_sales_data.py
 """
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from infrastructure.database.database_pool import DatabasePool

@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+
 from config.settings import settings
 
 logging.basicConfig(level=logging.INFO)

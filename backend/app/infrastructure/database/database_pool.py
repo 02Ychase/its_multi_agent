@@ -1,6 +1,6 @@
 import pymysql
-from dbutils.pooled_db import PooledDB
 from config.settings import settings
+from dbutils.pooled_db import PooledDB
 
 
 class DatabasePool:

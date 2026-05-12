@@ -1,5 +1,6 @@
 import stun
 
+
 def get_ip_via_stun():
     """
         [辅助函数] 获取本机公网 IP

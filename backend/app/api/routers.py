@@ -1,15 +1,14 @@
-from fastapi.routing import APIRouter
-from fastapi import Depends, Request
-from starlette.responses import StreamingResponse
-from pydantic import BaseModel
-
-from schemas.request import ChatMessageRequest, UserSessionsRequest, DeleteSessionRequest
-from services.agent_service import MultiAgentService
-from infrastructure.logging.logger import logger
-from services.conversation_service import conversation_service
-from repositories.tool_call_repository import get_tool_call_summary
 from api.auth_router import get_current_user
+from fastapi import Depends, Request
+from fastapi.routing import APIRouter
+from infrastructure.logging.logger import logger
 from infrastructure.rate_limiter import limiter
+from pydantic import BaseModel
+from repositories.tool_call_repository import get_tool_call_summary
+from schemas.request import ChatMessageRequest, DeleteSessionRequest, UserSessionsRequest
+from services.agent_service import MultiAgentService
+from services.conversation_service import conversation_service
+from starlette.responses import StreamingResponse
 
 # 1. 定义请求路由器
 router = APIRouter()
@@ -25,7 +24,6 @@ async def query(request: Request, request_context: ChatMessageRequest, current_u
     """
 
     # 1. 获取请求上下文的属性
-    user_id = current_user["user_id"]
     username = current_user["username"]
     user_query = request_context.query
     logger.info(f"用户 {username} 发送的待处理任务 {user_query}")
@@ -126,7 +124,6 @@ async def health_check():
 
     # 2. MCP 连接（轻量检查）
     try:
-        from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
         checks["mcp_search"] = "connected"
         checks["mcp_baidu"] = "connected"
     except Exception as e:

@@ -1,5 +1,6 @@
 import os
 import sys
+
 import pytest
 
 # Ensure backend/knowledge is on sys.path so imports like `config.settings` work

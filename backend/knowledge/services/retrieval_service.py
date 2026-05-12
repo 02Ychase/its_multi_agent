@@ -1,20 +1,22 @@
-import os
 import logging
-import jieba
+import os
 import re
+
+import jieba
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from typing import List, Dict, Any
+from typing import Any
+
+from config.settings import settings
 from langchain_core.documents import Document
+from langfuse import observe
 from repositories.vector_store_repository import VectorStoreRepository
 from services.ingestion.ingestion_processor import IngestionProcessor
-from utils.markdown_utils import MarkDownUtils
-from config.settings import settings
+from services.query_router import QueryComplexity, classify_query, decompose_query
 from sklearn.metrics.pairwise import cosine_similarity
-from langfuse import observe
-from services.query_router import classify_query, decompose_query, QueryComplexity
+from utils.markdown_utils import MarkDownUtils
 
 
 class RetrievalService:
@@ -63,7 +65,7 @@ class RetrievalService:
         return self._reranker_service
 
     @observe(as_type="retriever", name="rag_retrieval")
-    def retrieval(self, user_question: str) -> List[Document]:
+    def retrieval(self, user_question: str) -> list[Document]:
         # 0. 查询路由
         complexity = classify_query(user_question)
 
@@ -74,7 +76,7 @@ class RetrievalService:
         else:
             return self._retrieval_standard(user_question)
 
-    def _retrieval_simple(self, user_question: str) -> List[Document]:
+    def _retrieval_simple(self, user_question: str) -> list[Document]:
         """简单查询：跳过 HyDE，直接检索。"""
         bm25_candidates = self._search_bm25(user_question)
         vector_candidates = self._search_based_vector(user_question)
@@ -87,7 +89,7 @@ class RetrievalService:
             return self.reranker_service.rerank(user_question, unique_candidates)
         return self._cosine_rerank(user_question, unique_candidates)
 
-    def _retrieval_standard(self, user_question: str) -> List[Document]:
+    def _retrieval_standard(self, user_question: str) -> list[Document]:
         """标准查询：完整 HyDE + 三路检索 + 重排（原有逻辑）。"""
         if settings.HYDE_ENABLED:
             search_query = self.hyde_service.generate_hypothetical_document(user_question)
@@ -104,7 +106,7 @@ class RetrievalService:
             return self.reranker_service.rerank(user_question, unique_candidates)
         return self._cosine_rerank(user_question, unique_candidates)
 
-    def _retrieval_complex(self, user_question: str) -> List[Document]:
+    def _retrieval_complex(self, user_question: str) -> list[Document]:
         """复杂查询：分解为子查询，分别检索后合并。"""
         sub_queries = decompose_query(user_question)
         all_candidates = []
@@ -121,18 +123,17 @@ class RetrievalService:
             return self.reranker_service.rerank(user_question, unique_candidates)
         return self._cosine_rerank(user_question, unique_candidates)
 
-    def _search_bm25(self, user_question: str) -> List[Document]:
+    def _search_bm25(self, user_question: str) -> list[Document]:
         """BM25 keyword retrieval."""
         return self.bm25_retriever.search(user_question, top_k=settings.TOP_K_BM25)
 
-    def _search_based_vector(self, query: str) -> List[Document]:
+    def _search_based_vector(self, query: str) -> list[Document]:
         """Vector similarity retrieval."""
         documents_with_score = self.chroma_vector.search_similarity_with_score(query, top_k=5)
         return [doc for doc, _ in documents_with_score]
 
     def _get_cached_title_metadata(self):
         """获取标题元数据，优先从缓存读取。"""
-        import hashlib
         current_hash = self._compute_dir_hash(settings.CRAWL_OUTPUT_DIR)
         if self._title_metadata_cache is not None and self._title_cache_hash == current_hash:
             return [dict(m) for m in self._title_metadata_cache]
@@ -153,7 +154,7 @@ class RetrievalService:
                 hasher.update(f"{fname}:{stat.st_size}:{stat.st_mtime}".encode())
         return hasher.hexdigest()
 
-    def _search_based_title(self, user_query: str) -> List[Document]:
+    def _search_based_title(self, user_query: str) -> list[Document]:
         """Title-based retrieval with caching."""
         mds_metadata = self._get_cached_title_metadata()
         rough_mds_metadata = self.rough_ranking(user_query, mds_metadata)
@@ -162,7 +163,7 @@ class RetrievalService:
         based_title_candidates = []
         for fine_md_metadata in fine_mds_metadata:
             try:
-                with open(fine_md_metadata['path'], "r", encoding="utf-8") as f:
+                with open(fine_md_metadata['path'], encoding="utf-8") as f:
                     content = f.read().strip()
                 if len(content) < 3000:
                     doc = Document(page_content=content, metadata={
@@ -179,7 +180,7 @@ class RetrievalService:
 
         return based_title_candidates
 
-    def rough_ranking(self, user_query, mds_metadata: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def rough_ranking(self, user_query, mds_metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Rough ranking based on jieba title matching."""
         if not user_query:
             return []
@@ -205,7 +206,7 @@ class RetrievalService:
 
         return sorted(mds_metadata, key=lambda x: x['roughing_score'], reverse=True)[:50]
 
-    def fine_ranking(self, user_query: str, rough_mds_metadata: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def fine_ranking(self, user_query: str, rough_mds_metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Fine ranking based on embedding similarity."""
         if not rough_mds_metadata:
             return []
@@ -226,7 +227,7 @@ class RetrievalService:
 
         return sorted(rough_mds_metadata, key=lambda x: x['final_score'], reverse=True)[:settings.TOP_K_TITLE]
 
-    def _deduplicate(self, total_candidates: List[Document]) -> List[Document]:
+    def _deduplicate(self, total_candidates: list[Document]) -> list[Document]:
         """Deduplicate documents by (title, first 100 chars)."""
         if not total_candidates:
             return []
@@ -242,7 +243,7 @@ class RetrievalService:
 
         return unique_candidates
 
-    def _cosine_rerank(self, user_question: str, unique_candidates: List[Document]) -> List[Document]:
+    def _cosine_rerank(self, user_question: str, unique_candidates: list[Document]) -> list[Document]:
         """Fallback cosine similarity reranking when reranker is not available."""
         if not unique_candidates:
             return []
@@ -255,7 +256,7 @@ class RetrievalService:
         scored_docs = sorted(zip(unique_candidates, similarity), key=lambda x: x[1], reverse=True)
         return [doc for doc, _ in scored_docs[:settings.TOP_FINAL]]
 
-    def _deal_long_title_content(self, content: str, fine_md_metadata: Dict[str, Any], user_query: str) -> List[Document]:
+    def _deal_long_title_content(self, content: str, fine_md_metadata: dict[str, Any], user_query: str) -> list[Document]:
         """Process long documents by chunking and selecting top-3 relevant chunks."""
         chunks = self.spliter.document_spliter.split_text(content)
         doc_chunks_title = fine_md_metadata['title']

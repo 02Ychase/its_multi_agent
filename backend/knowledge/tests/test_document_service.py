@@ -1,10 +1,10 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from services.document_service import (
-    sha256_file,
-    generate_document_id,
     check_duplicate,
     create_document_record,
+    generate_document_id,
+    sha256_file,
     update_document_status,
 )
 

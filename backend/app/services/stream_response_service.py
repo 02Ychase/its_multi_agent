@@ -1,15 +1,15 @@
 from collections.abc import AsyncGenerator
+
+from agents.items import ToolCallItem
 from agents.run import RunResultStreaming
 from openai.types.responses.response_stream_event import (
-    ResponseTextDeltaEvent,
-    ResponseReasoningTextDeltaEvent,
     ResponseReasoningSummaryTextDeltaEvent,
+    ResponseReasoningTextDeltaEvent,
+    ResponseTextDeltaEvent,
 )
-from agents.items import ToolCallItem
-
-from utils.response_util import ResponseFactory
-from utils.text_util import format_tool_call_html, format_agent_update_html
 from schemas.response import ContentKind
+from utils.response_util import ResponseFactory
+from utils.text_util import format_agent_update_html, format_tool_call_html
 
 
 async def process_stream_response(streaming_result: RunResultStreaming) -> AsyncGenerator:

@@ -1,11 +1,11 @@
 import asyncio
-import json
-import time
 import logging
-from typing import Any, Awaitable, Callable
+import time
+from collections.abc import Awaitable, Callable
+from typing import Any
 
-from schemas.tooling import ToolExecutionConfig, ToolExecutionResult
 from repositories.tool_call_repository import insert_tool_call_log
+from schemas.tooling import ToolExecutionConfig, ToolExecutionResult
 
 logger = logging.getLogger(__name__)
 

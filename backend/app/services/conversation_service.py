@@ -1,7 +1,7 @@
-from typing import List, Dict, Any
-from repositories import chat_session_repository as session_repo
+from typing import Any
+
 from repositories import chat_message_repository as message_repo
-from infrastructure.logging.logger import logger
+from repositories import chat_session_repository as session_repo
 
 
 class ConversationService:
@@ -11,7 +11,7 @@ class ConversationService:
         self._session_repo = session_repo
         self._message_repo = message_repo
 
-    async def prepare_history(self, user_id: int, username: str, session_id: str | None, user_input: str, max_turn: int = 3) -> List[Dict[str, Any]]:
+    async def prepare_history(self, user_id: int, username: str, session_id: str | None, user_input: str, max_turn: int = 3) -> list[dict[str, Any]]:
         target_session_id = session_id if session_id else self.DEFAULT_SESSION_ID
         session_pk = self._session_repo.get_or_create_session(user_id, target_session_id)
 
@@ -38,7 +38,7 @@ class ConversationService:
     def save_assistant_final(self, user_id: int, username: str, session_id: str | None, content: str) -> None:
         self.append_message(user_id, username, session_id, "assistant", content)
 
-    def get_all_sessions_memory(self, user_id: int, username: str) -> List[Dict[str, Any]]:
+    def get_all_sessions_memory(self, user_id: int, username: str) -> list[dict[str, Any]]:
         sessions = self._session_repo.get_sessions_by_user(user_id)
         formatted = []
         for row in sessions:
@@ -60,7 +60,7 @@ class ConversationService:
     def delete_session(self, user_id: int, session_id: str) -> bool:
         return self._session_repo.delete_session(user_id, session_id)
 
-    def _truncate_history(self, chat_history: List[Dict[str, Any]], max_turn: int = 3) -> List[Dict[str, Any]]:
+    def _truncate_history(self, chat_history: list[dict[str, Any]], max_turn: int = 3) -> list[dict[str, Any]]:
         system_msg = [msg for msg in chat_history if msg.get('role') == 'system']
         no_system_msg = [msg for msg in chat_history if msg.get('role') != 'system']
         msg_limit = max_turn * 2

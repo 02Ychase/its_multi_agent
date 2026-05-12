@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Optional, Union, List, Literal
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -68,8 +69,8 @@ class StructuredMessageBody(MessageBody):
 class PacketMeta(BaseModel):
     """数据包元数据"""
     createTime: str
-    finishReason: Optional[StopReason] = None
-    errorMessage: Optional[str] = None
+    finishReason: StopReason | None = None
+    errorMessage: str | None = None
 
 
 class StreamPacket(BaseModel):
@@ -78,6 +79,6 @@ class StreamPacket(BaseModel):
     这是后端 yield 给前端的最小数据单元。
     """
     id: str
-    content: Union[TextMessageBody, FinishMessageBody, StructuredMessageBody]
+    content: TextMessageBody | FinishMessageBody | StructuredMessageBody
     status: StreamStatus
     metadata: PacketMeta

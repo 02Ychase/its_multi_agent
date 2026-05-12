@@ -1,16 +1,15 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 # 引入新的模型名称
 from schemas.response import (
-    StreamPacket,
-    TextMessageBody,
+    ContentKind,
     FinishMessageBody,
-    StructuredMessageBody,
-    StreamStatus,
     PacketMeta,
-    ContentKind
+    StreamPacket,
+    StreamStatus,
+    StructuredMessageBody,
+    TextMessageBody,
 )
 
 
@@ -37,7 +36,7 @@ class ResponseFactory:
         )
 
     @staticmethod
-    def build_finish(message_id: Optional[str] = None) -> StreamPacket:
+    def build_finish(message_id: str | None = None) -> StreamPacket:
         """
         构建结束信号响应
         """

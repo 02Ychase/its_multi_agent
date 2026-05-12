@@ -7,23 +7,22 @@ RAG 检索质量评测模块
 import asyncio
 import logging
 import time
-import yaml
-import httpx
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
+import httpx
+import yaml
+from config.settings import settings
 from datasets import Dataset
+from infrastructure.observability.langfuse_client import flush_langfuse, langfuse
+from langfuse import observe
 from ragas import evaluate
 from ragas.metrics.collections import (
+    answer_relevancy,
     context_precision,
     context_recall,
     faithfulness,
-    answer_relevancy,
 )
-
-from langfuse import observe
-from infrastructure.observability.langfuse_client import langfuse, flush_langfuse
-from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +30,13 @@ TEST_CASES_PATH = Path(__file__).parent / "test_cases_rag.yaml"
 KNOWLEDGE_API = settings.KNOWLEDGE_BASE_URL or "http://127.0.0.1:8001"
 
 
-def load_rag_test_cases() -> List[Dict[str, Any]]:
+def load_rag_test_cases() -> list[dict[str, Any]]:
     """加载 RAG 评测用例。"""
-    with open(TEST_CASES_PATH, "r", encoding="utf-8") as f:
+    with open(TEST_CASES_PATH, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-async def query_knowledge_service(question: str) -> Dict[str, Any]:
+async def query_knowledge_service(question: str) -> dict[str, Any]:
     """
     调用知识库服务获取回答和检索上下文。
 
@@ -72,7 +71,7 @@ async def query_knowledge_service(question: str) -> Dict[str, Any]:
 
 
 @observe(as_type="agent", name="rag_evaluation")
-async def run_single_rag_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
+async def run_single_rag_case(test_case: dict[str, Any]) -> dict[str, Any]:
     """
     运行单条 RAG 评测用例。
 
@@ -124,7 +123,7 @@ async def run_single_rag_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 
-def compute_ragas_scores(results: List[Dict[str, Any]]) -> Dict[str, float]:
+def compute_ragas_scores(results: list[dict[str, Any]]) -> dict[str, float]:
     """
     使用 RAGAS 计算评测指标。
 

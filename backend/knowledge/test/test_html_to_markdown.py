@@ -1,5 +1,3 @@
-from markdownify import markdownify as md
-import  re
 # 1. HTML 内容
 # 这是从知识库网页上爬取下来的内容片段
 

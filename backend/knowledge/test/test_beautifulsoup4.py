@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+
 """
 解析网页： 它可以将下载下来的 HTML 源代码（即使是格式混乱、标签闭合不全”）解析成一个标准的树状结构。
 

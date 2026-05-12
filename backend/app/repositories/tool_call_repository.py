@@ -1,4 +1,5 @@
 import json
+
 from infrastructure.database.database_pool import DatabasePool
 from infrastructure.logging.logger import logger
 

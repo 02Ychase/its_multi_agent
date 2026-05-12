@@ -1,11 +1,12 @@
 import asyncio
+from contextlib import AsyncExitStack
+
 from agents import Agent, Runner
 from infrastructure.ai.openai_client import main_model
 from infrastructure.ai.prompt_loader import load_prompt
+from infrastructure.tools.mcp.mcp_servers import baidu_mcp_client, search_mcp_client
 from multi_agent.agent_factory import AGENT_TOOLS
 from multi_agent.guardrails import input_guardrail, output_guardrail
-from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
-from contextlib import AsyncExitStack
 
 # 1. 创建主调度智能体（纯 Tool Calling 模式，不使用 Handoff）
 orchestrator_agent = Agent(

@@ -1,13 +1,13 @@
-import os
-import pickle
 import hashlib
 import logging
-import jieba
+import os
+import pickle
 from pathlib import Path
-from typing import List
-from rank_bm25 import BM25Okapi
-from langchain_core.documents import Document
+
+import jieba
 from config.settings import settings
+from langchain_core.documents import Document
+from rank_bm25 import BM25Okapi
 
 SUPPORTED_EXTENSIONS = {'.md', '.txt', '.docx', '.pdf'}
 
@@ -26,9 +26,9 @@ class BM25Retriever:
     """
 
     def __init__(self):
-        self.corpus_texts: List[str] = []
-        self.corpus_paths: List[str] = []
-        self.corpus_titles: List[str] = []
+        self.corpus_texts: list[str] = []
+        self.corpus_paths: list[str] = []
+        self.corpus_titles: list[str] = []
         self.bm25: BM25Okapi | None = None
 
         current_hash = self._compute_directory_hash()
@@ -64,7 +64,7 @@ class BM25Retriever:
         if not os.path.exists(BM25_INDEX_PATH) or not os.path.exists(BM25_HASH_PATH):
             return False
         try:
-            with open(BM25_HASH_PATH, "r") as f:
+            with open(BM25_HASH_PATH) as f:
                 saved_hash = f.read().strip()
             if saved_hash != current_hash:
                 logger.info("Document files changed, will rebuild BM25 index")
@@ -111,7 +111,7 @@ class BM25Retriever:
         """根据文件格式读取内容。"""
         ext = Path(file_path).suffix.lower()
         if ext in ('.md', '.txt'):
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 return f.read().strip()
         elif ext in ('.pdf', '.docx'):
             from docling.document_converter import DocumentConverter
@@ -156,7 +156,7 @@ class BM25Retriever:
         else:
             logger.warning("BM25 index is empty - no documents loaded")
 
-    def search(self, query: str, top_k: int = 10) -> List[Document]:
+    def search(self, query: str, top_k: int = 10) -> list[Document]:
         """BM25 检索，与原逻辑完全相同。"""
         if self.bm25 is None or not self.corpus_texts:
             return []

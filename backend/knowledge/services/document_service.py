@@ -1,8 +1,8 @@
 import hashlib
-import uuid
 import logging
+import uuid
 
-from repositories import document_repository, chunk_repository
+from repositories import chunk_repository, document_repository
 
 logger = logging.getLogger(__name__)
 

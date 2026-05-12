@@ -1,5 +1,5 @@
-from langfuse import Langfuse
 from config.settings import settings
+from langfuse import Langfuse
 
 
 def create_langfuse_client() -> Langfuse:

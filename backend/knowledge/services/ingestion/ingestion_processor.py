@@ -1,13 +1,12 @@
-import os.path
+import logging
 from pathlib import Path
 
-from repositories.vector_store_repository import VectorStoreRepository
 from langchain_community.document_loaders import TextLoader
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
 from langchain_community.vectorstores.utils import filter_complex_metadata
+from langchain_core.documents import Document
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+from repositories.vector_store_repository import VectorStoreRepository
 from utils.markdown_utils import MarkDownUtils
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

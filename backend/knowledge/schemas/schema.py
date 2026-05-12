@@ -1,4 +1,4 @@
-from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -7,23 +7,23 @@ class UploadResponse(BaseModel):
     message: str
     file_name: str
     chunks_added: int
-    document_id: Optional[str] = None
+    document_id: str | None = None
     duplicate: bool = False
 
 
 class Citation(BaseModel):
-    document_id: Optional[str] = None
-    chunk_id: Optional[str] = None
-    title: Optional[str] = None
-    source_filename: Optional[str] = None
-    chunk_index: Optional[int] = None
-    score: Optional[float] = None
+    document_id: str | None = None
+    chunk_id: str | None = None
+    title: str | None = None
+    source_filename: str | None = None
+    chunk_index: int | None = None
+    score: float | None = None
 
 
 class QueryResponse(BaseModel):
     question: str
     answer: str
-    citations: List[Citation] = []
+    citations: list[Citation] = []
 
 
 class QueryRequest(BaseModel):
@@ -32,12 +32,12 @@ class QueryRequest(BaseModel):
 
 class RetrievalResponse(BaseModel):
     question: str
-    contexts: List[str]
+    contexts: list[str]
 
 
 class DocumentListResponse(BaseModel):
     total: int
-    documents: List[dict]
+    documents: list[dict]
 
 
 class DocumentActionResponse(BaseModel):

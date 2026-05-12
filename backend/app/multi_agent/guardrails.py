@@ -4,21 +4,17 @@ Agent Guardrails — 输入/输出安全护栏
 使用 openai-agents SDK 的 GuardrailFunctionOutput / InputGuardrail / OutputGuardrail 实现。
 """
 
+import re
+
 from agents import (
+    Agent,
     GuardrailFunctionOutput,
     InputGuardrail,
     OutputGuardrail,
     RunContextWrapper,
-    Agent,
-    Runner,
     TResponseInputItem,
 )
 from infrastructure.logging.logger import logger
-from infrastructure.ai.openai_client import sub_model
-from pydantic import BaseModel
-import re
-from typing import List
-
 
 # ============================================================
 # 1. 输入护栏：Prompt 注入检测
@@ -49,7 +45,7 @@ SENSITIVE_KEYWORDS = [
 async def input_guardrail_fn(
     ctx: RunContextWrapper,
     agent: Agent,
-    input: str | List[TResponseInputItem],
+    input: str | list[TResponseInputItem],
 ) -> GuardrailFunctionOutput:
     """
     输入护栏函数。检测：

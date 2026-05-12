@@ -4,12 +4,14 @@
 
 """
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logger=logging.getLogger(__name__)
-import uvicorn
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
+import uvicorn
 from api.routers import router
+from fastapi import FastAPI
 
 
 @asynccontextmanager

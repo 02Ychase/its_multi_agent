@@ -1,6 +1,6 @@
-import  os
+import os
 import re
-from typing import List,Dict,Any
+from typing import Any
 
 
 class MarkDownUtils:
@@ -9,7 +9,7 @@ class MarkDownUtils:
     """
 
     @staticmethod
-    def collect_md_metadata(folder_path: str) -> List[Dict[str, Any]]:
+    def collect_md_metadata(folder_path: str) -> list[dict[str, Any]]:
         """
         收集Markdown文件元数据
 

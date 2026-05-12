@@ -1,7 +1,8 @@
-from typing import List
+
+from config.settings import settings
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
-from config.settings import settings
+
 
 class QueryService:
     """检索服务"""
@@ -15,7 +16,7 @@ class QueryService:
 
 
 
-    def generate_answer(self, user_question:str, retrival_context: List[Document]) -> str:
+    def generate_answer(self, user_question:str, retrival_context: list[Document]) -> str:
         """
         对接大语言模型的入口
         Args:

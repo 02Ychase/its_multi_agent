@@ -7,10 +7,9 @@
 - COMPLEX: 查询分解为子查询，分别检索后合并去重 + 重排
 """
 
-import re
 import logging
+import re
 from enum import Enum
-from typing import List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -65,7 +64,7 @@ def classify_query(query: str) -> QueryComplexity:
     return QueryComplexity.STANDARD
 
 
-def decompose_query(query: str) -> List[str]:
+def decompose_query(query: str) -> list[str]:
     """
     将复杂查询分解为多个子查询（基于规则）。
     返回子查询列表，至少包含原始查询。

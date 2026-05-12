@@ -2,8 +2,8 @@ from agents import function_tool
 from infrastructure.logging.logger import logger
 from repositories.after_sales_repository import (
     query_order_by_id,
-    query_warranty_by_product,
     query_repair_by_id,
+    query_warranty_by_product,
 )
 
 

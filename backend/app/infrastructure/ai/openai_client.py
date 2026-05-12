@@ -1,6 +1,6 @@
 from agents import OpenAIChatCompletionsModel
-from openai import AsyncOpenAI
 from config.settings import settings
+from openai import AsyncOpenAI
 
 # 主模型配置 (MiMo)
 MAIN_API_KEY = settings.MAIN_API_KEY

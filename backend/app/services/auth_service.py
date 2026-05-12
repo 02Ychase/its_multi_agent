@@ -1,14 +1,12 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Optional
-
-from passlib.context import CryptContext
-from jose import JWTError, jwt
 
 from config.settings import settings
-from models.user import get_user_by_username, create_user
-from models.refresh_token import save_refresh_token, is_refresh_token_active, revoke_refresh_token
 from infrastructure.logging.logger import logger
+from jose import JWTError, jwt
+from models.refresh_token import is_refresh_token_active, revoke_refresh_token, save_refresh_token
+from models.user import create_user, get_user_by_username
+from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -38,7 +36,7 @@ def create_refresh_token(data: dict) -> str:
     return token
 
 
-def decode_token(token: str) -> Optional[dict]:
+def decode_token(token: str) -> dict | None:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         return payload

@@ -1,9 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, Header
-from pydantic import BaseModel
-from typing import Optional
 
-from services.auth_service import register_user, login_user, refresh_access_token, decode_token, logout_user
-from infrastructure.logging.logger import logger
+from fastapi import APIRouter, Depends, Header, HTTPException
+from pydantic import BaseModel
+from services.auth_service import decode_token, login_user, logout_user, refresh_access_token, register_user
 
 router = APIRouter(prefix="/api/auth", tags=["认证"])
 
@@ -31,7 +29,7 @@ class LogoutRequest(BaseModel):
 
 # ==================== Dependency ====================
 
-async def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
+async def get_current_user(authorization: str | None = Header(None)) -> dict:
     """Extract and validate user from Authorization header."""
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="未提供认证令牌")

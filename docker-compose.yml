@@ -59,7 +59,8 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - backend/app/.env
+      - path: backend/app/.env
+        required: false
     environment:
       MYSQL_HOST: mysql
       KNOWLEDGE_BASE_URL: http://knowledge:8001
@@ -86,7 +87,8 @@ services:
     ports:
       - "8001:8001"
     env_file:
-      - backend/knowledge/.env
+      - path: backend/knowledge/.env
+        required: false
     environment:
       MYSQL_HOST: mysql
     volumes:

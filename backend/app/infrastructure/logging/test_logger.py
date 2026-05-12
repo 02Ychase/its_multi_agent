@@ -1,5 +1,6 @@
 from logger import logger
 
+
 def some_function():
     # 1. 这种只会出现在 agent_debug.log (用于开发时看变量、Prompt)
     logger.debug("正在向硅基流动发送请求，Prompt长度: 500...")

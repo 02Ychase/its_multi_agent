@@ -1,22 +1,27 @@
-import os.path
 import logging
-import aiofiles
+import os.path
 import shutil
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-from fastapi import APIRouter, UploadFile, File, HTTPException
+
+from config.settings import settings
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
-from services.ingestion.ingestion_processor import IngestionProcessor, SUPPORTED_EXTENSIONS
-from schemas.schema import UploadResponse, QueryResponse, QueryRequest, RetrievalResponse, DocumentListResponse, DocumentActionResponse
-from services.retrieval_service import RetrievalService
-from services.query_service import QueryService
+from schemas.schema import (
+    DocumentActionResponse,
+    DocumentListResponse,
+    QueryRequest,
+    QueryResponse,
+    RetrievalResponse,
+    UploadResponse,
+)
 from services import document_service
 from services.citation_service import build_citations
+from services.ingestion.ingestion_processor import IngestionProcessor
+from services.query_service import QueryService
+from services.retrieval_service import RetrievalService
 from services.upload_validation import sanitize_filename, validate_upload_extension, validate_upload_size
-from config.settings import settings
-
-import tempfile
 
 # 1.创建APIRouter
 router = APIRouter()

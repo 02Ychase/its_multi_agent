@@ -1,15 +1,16 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
+from api.auth_router import router as auth_router
+from api.routers import router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from api.routers import router
-from api.auth_router import router as auth_router
 from infrastructure.logging.logger import logger
-from infrastructure.tools.mcp.mcp_manager import mcp_connect, mcp_cleanup
 from infrastructure.observability.langfuse_client import flush_langfuse
+from infrastructure.rate_limiter import limiter
+from infrastructure.tools.mcp.mcp_manager import mcp_cleanup, mcp_connect
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from infrastructure.rate_limiter import limiter
 
 
 @asynccontextmanager
@@ -36,9 +37,9 @@ async def lifespan(app: FastAPI):
         logger.error(f"用户表初始化失败: {str(e)}")
 
     try:
-        from repositories.chat_session_repository import init_chat_sessions_table
-        from repositories.chat_message_repository import init_chat_messages_table
         from repositories.agent_event_repository import init_agent_event_tables
+        from repositories.chat_message_repository import init_chat_messages_table
+        from repositories.chat_session_repository import init_chat_sessions_table
         init_chat_sessions_table()
         init_chat_messages_table()
         init_agent_event_tables()

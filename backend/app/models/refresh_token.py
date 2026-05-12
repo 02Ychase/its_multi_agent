@@ -1,5 +1,6 @@
 import hashlib
 from datetime import datetime
+
 from infrastructure.database.database_pool import DatabasePool
 from infrastructure.logging.logger import logger
 

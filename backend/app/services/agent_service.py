@@ -1,17 +1,18 @@
 import re
+import traceback
 from collections.abc import AsyncGenerator
-from agents.run import Runner
+
 from agents.exceptions import InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered
+from agents.run import Runner
+from infrastructure.logging.logger import logger
 from langfuse import observe
 from multi_agent.orchestrator_agent import orchestrator_agent
 from schemas.request import ChatMessageRequest
-from services.session_service import session_service
+from schemas.response import ContentKind
 from services.conversation_service import conversation_service
+from services.session_service import session_service
 from services.stream_response_service import process_stream_response
 from utils.response_util import ResponseFactory
-from infrastructure.logging.logger import logger
-import traceback
-from schemas.response import ContentKind
 
 
 class MultiAgentService:
@@ -111,7 +112,7 @@ class MultiAgentService:
 
             # 如果允许重试，则启动重试流程
             if flag:
-                text = f"🔄 正在尝试自动重试..."
+                text = "🔄 正在尝试自动重试..."
                 yield "data: " + ResponseFactory.build_text(
                     text, ContentKind.PROCESS
                 ).model_dump_json() + "\n\n"

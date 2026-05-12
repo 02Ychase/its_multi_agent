@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     
     # knowledge/config
-    KNOWLEDGE_BASE_URL:str=os.environ.get("KNOWLEDGE_BASE_URL")
+    KNOWLEDGE_BASE_URL: str = os.environ.get("KNOWLEDGE_BASE_URL", "http://127.0.0.1:8001")
 
     _current_dir = os.path.dirname(os.path.abspath(__file__))
     # knowledge

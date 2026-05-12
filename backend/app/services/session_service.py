@@ -1,7 +1,7 @@
-from typing import List, Dict, Any
-from services.conversation_service import conversation_service
+from typing import Any
+
 from models.user import get_user_by_username
-from infrastructure.logging.logger import logger
+from services.conversation_service import conversation_service
 
 
 class SessionService:
@@ -23,11 +23,11 @@ class SessionService:
             return user["id"], user_id
         return 0, user_id
 
-    def prepare_history(self, user_id: str, session_id: str, user_input: str, max_turn: int = 3) -> List[Dict[str, Any]]:
+    def prepare_history(self, user_id: str, session_id: str, user_input: str, max_turn: int = 3) -> list[dict[str, Any]]:
         numeric_id, username = self._resolve_user_id(user_id)
         return self._conv.prepare_history(numeric_id, username, session_id, user_input, max_turn)
 
-    def save_history(self, user_id: str, session_id: str, chat_history: List[Dict[str, Any]]):
+    def save_history(self, user_id: str, session_id: str, chat_history: list[dict[str, Any]]):
         if chat_history is None:
             return
         numeric_id, username = self._resolve_user_id(user_id)
@@ -35,7 +35,7 @@ class SessionService:
         if assistant_msgs:
             self._conv.save_assistant_final(numeric_id, username, session_id, assistant_msgs[-1]["content"])
 
-    def get_all_sessions_memory(self, user_id: str) -> List[Dict[str, Any]]:
+    def get_all_sessions_memory(self, user_id: str) -> list[dict[str, Any]]:
         numeric_id, username = self._resolve_user_id(user_id)
         return self._conv.get_all_sessions_memory(numeric_id, username)
 
@@ -43,13 +43,13 @@ class SessionService:
         numeric_id, _ = self._resolve_user_id(user_id)
         return self._conv.delete_session(numeric_id, session_id)
 
-    def _init_system_msg_instruct(self, session_id) -> List[Dict[str, Any]]:
+    def _init_system_msg_instruct(self, session_id) -> list[dict[str, Any]]:
         return [{
             "role": "system",
             "content": f"你是一个有记忆的智能体助手，请基于上下文历史会话用户问题 (会话ID {session_id})"
         }]
 
-    def _truncate_history(self, chat_history: List[Dict[str, Any]], max_turn: int = 3) -> List[Dict[str, Any]]:
+    def _truncate_history(self, chat_history: list[dict[str, Any]], max_turn: int = 3) -> list[dict[str, Any]]:
         system_msg = [msg for msg in chat_history if msg.get('role') == 'system']
         no_system_msg = [msg for msg in chat_history if msg.get('role') != 'system']
         msg_limit = max_turn * 2

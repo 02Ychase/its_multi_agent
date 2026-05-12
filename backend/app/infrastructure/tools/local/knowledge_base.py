@@ -1,13 +1,13 @@
 import asyncio
+
 import httpx
-from typing import Dict
 from agents import function_tool
-from infrastructure.logging.logger import logger
 from config.settings import settings
+from infrastructure.logging.logger import logger
 
 
 @function_tool
-async def query_knowledge(question: str) -> Dict:
+async def query_knowledge(question: str) -> dict:
     """
        查询电脑问题知识库服务,用于检索与用户问题相关的技术文档或解决方案。
 

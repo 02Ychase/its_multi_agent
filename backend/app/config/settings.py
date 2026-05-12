@@ -8,10 +8,9 @@
 4. 配置文档化
 """
 from pathlib import Path
-from typing import Optional
-from pydantic import Field
+
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import model_validator
 from typing_extensions import Self
 
 
@@ -28,22 +27,22 @@ class Settings(BaseSettings):
     # ==================== AI 服务配置 ====================
 
     # 主模型 API (MiMo)
-    MAIN_API_KEY: Optional[str] = Field(default=None, description="主模型 API Key")
-    MAIN_BASE_URL: Optional[str] = Field(default=None, description="主模型 Base URL")
-    MAIN_MODEL_NAME: Optional[str] = Field(default="MiMo-V2.5-Pro", description="主模型名称")
+    MAIN_API_KEY: str | None = Field(default=None, description="主模型 API Key")
+    MAIN_BASE_URL: str | None = Field(default=None, description="主模型 Base URL")
+    MAIN_MODEL_NAME: str | None = Field(default="MiMo-V2.5-Pro", description="主模型名称")
 
     # 子模型 API (MiniMax)
-    SUB_API_KEY: Optional[str] = Field(default=None, description="子模型 API Key")
-    SUB_BASE_URL: Optional[str] = Field(default=None, description="子模型 Base URL")
-    SUB_MODEL_NAME: Optional[str] = Field(default="MiniMax-m2.7", description="子模型名称")
+    SUB_API_KEY: str | None = Field(default=None, description="子模型 API Key")
+    SUB_BASE_URL: str | None = Field(default=None, description="子模型 Base URL")
+    SUB_MODEL_NAME: str | None = Field(default="MiniMax-m2.7", description="子模型名称")
 
     # ==================== 数据库配置 ====================
 
-    MYSQL_HOST: Optional[str] = Field(default="localhost", description="MySQL主机地址")
+    MYSQL_HOST: str | None = Field(default="localhost", description="MySQL主机地址")
     MYSQL_PORT: int = Field(default=3306, description="MySQL端口")
-    MYSQL_USER: Optional[str] = Field(default="root", description="MySQL用户名")
-    MYSQL_PASSWORD: Optional[str] = Field(default="", description="MySQL密码")
-    MYSQL_DATABASE: Optional[str] = Field(default="its_db", description="MySQL数据库名")
+    MYSQL_USER: str | None = Field(default="root", description="MySQL用户名")
+    MYSQL_PASSWORD: str | None = Field(default="", description="MySQL密码")
+    MYSQL_DATABASE: str | None = Field(default="its_db", description="MySQL数据库名")
     MYSQL_CHARSET: str = Field(default="utf8mb4", description="MySQL字符集")
     MYSQL_CONNECT_TIMEOUT: int = Field(default=10, description="MySQL连接超时（秒）")
     MYSQL_MAX_CONNECTIONS: int = Field(default=5, description="MySQL最大连接数")
@@ -51,38 +50,38 @@ class Settings(BaseSettings):
     # ==================== 外部服务配置 ====================
 
     # 知识库服务
-    KNOWLEDGE_BASE_URL: Optional[str] = Field(
+    KNOWLEDGE_BASE_URL: str | None = Field(
         default=None,
         description="知识库服务URL"
     )
 
     # 通义千问搜索服务
-    DASHSCOPE_BASE_URL: Optional[str] = Field(
+    DASHSCOPE_BASE_URL: str | None = Field(
         default=None,
         description="通义千问 DashScope Base URL"
     )
-    DASHSCOPE_API_KEY: Optional[str] = Field(
+    DASHSCOPE_API_KEY: str | None = Field(
         default=None,
         description="通义千问 DashScope API Key"
     )
 
     # 百度地图服务
-    BAIDUMAP_AK: Optional[str] = Field(
+    BAIDUMAP_AK: str | None = Field(
         default=None,
         description="百度地图 AK (Access Key)"
     )
 
     # ==================== Langfuse 可观测性配置 ====================
 
-    LANGFUSE_PUBLIC_KEY: Optional[str] = Field(
+    LANGFUSE_PUBLIC_KEY: str | None = Field(
         default=None,
         description="Langfuse Public Key"
     )
-    LANGFUSE_SECRET_KEY: Optional[str] = Field(
+    LANGFUSE_SECRET_KEY: str | None = Field(
         default=None,
         description="Langfuse Secret Key"
     )
-    LANGFUSE_HOST: Optional[str] = Field(
+    LANGFUSE_HOST: str | None = Field(
         default="http://localhost:3001",
         description="Langfuse Server URL"
     )
@@ -139,6 +138,17 @@ class Settings(BaseSettings):
 
         if not has_service:
             raise ValueError("必须配置至少一个 AI 服务 (主模型或子模型)")
+
+        # JWT 密钥安全检查
+        import logging
+        _logger = logging.getLogger("config")
+        INSECURE_DEFAULTS = {"change-me-in-production", "secret", "test", ""}
+        if self.JWT_SECRET_KEY in INSECURE_DEFAULTS:
+            _logger.warning(
+                "⚠️  JWT_SECRET_KEY 使用了不安全的默认值，"
+                "请在 .env 中配置一个至少 32 字符的随机密钥。"
+                "生产环境中此配置将导致安全漏洞。"
+            )
 
         return self
 

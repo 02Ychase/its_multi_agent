@@ -3,8 +3,8 @@ from infrastructure.ai.openai_client import sub_model
 from infrastructure.ai.prompt_loader import load_prompt
 from infrastructure.tools.local.after_sales import (
     query_order_status,
-    query_warranty_info,
     query_repair_progress,
+    query_warranty_info,
 )
 
 # 订单售后智能体

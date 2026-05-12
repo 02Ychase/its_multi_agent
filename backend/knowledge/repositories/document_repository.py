@@ -1,4 +1,5 @@
 import logging
+
 from infrastructure.database.database_pool import DatabasePool
 
 logger = logging.getLogger(__name__)

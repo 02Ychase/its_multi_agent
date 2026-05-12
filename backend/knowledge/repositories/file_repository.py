@@ -1,6 +1,6 @@
-import os
 import hashlib
-from typing import List, Dict, Any
+import os
+
 
 class FileRepository:
     @staticmethod
@@ -13,7 +13,7 @@ class FileRepository:
         return hash_md5.hexdigest()
 
     @staticmethod
-    def remove_duplicate_files(file_paths: List[str]) -> List[str]:
+    def remove_duplicate_files(file_paths: list[str]) -> list[str]:
         """
         去除重复文件
         """
@@ -52,7 +52,7 @@ class FileRepository:
 
         try:
             # 尝试以 UTF-8 读取
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 return f.read()
 
         except UnicodeDecodeError:
@@ -92,7 +92,7 @@ class FileRepository:
             print(f"发生未知错误: {e}")
 
     @staticmethod
-    def list_files(directory: str, extension: str = None) -> List[str]:
+    def list_files(directory: str, extension: str = None) -> list[str]:
         """
         列出目录下的文件
         :param extension: 过滤后缀，例如 '.md' (不区分大小写会更好)

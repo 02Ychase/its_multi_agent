@@ -1,10 +1,8 @@
-from infrastructure.ai.prompt_loader import load_prompt
+from agents import Agent, RunConfig, Runner
 from infrastructure.ai.openai_client import sub_model
+from infrastructure.ai.prompt_loader import load_prompt
 from infrastructure.tools.local.knowledge_base import query_knowledge
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client
-from agents import Agent, ModelSettings
-from agents import Runner,RunConfig
-
 
 # 1. 定义技术智能体
 technical_agent = Agent(
@@ -33,7 +31,7 @@ async def run_single_test(case_name: str, input_text: str):
     finally:
         try:
             await search_mcp_client.cleanup()
-        except:
+        except Exception:
             pass
 
 

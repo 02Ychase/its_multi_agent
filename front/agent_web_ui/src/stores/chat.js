@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, nextTick } from 'vue'
 import { useAuthStore } from './auth'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE || ''
 
 /**
  * 带自动 token 刷新的 fetch 封装
@@ -176,6 +176,16 @@ export const useChatStore = defineStore('chat', () => {
       if (kind && text) {
         if (kind === 'ANSWER') appendAnswer(text)
         else if (kind === 'THINKING') appendThinking(text)
+        else if (kind === 'STRUCTURED') {
+          // 结构化数据：作为特殊消息类型存储
+          chatMessages.value.push({
+            type: 'STRUCTURED',
+            cardType: parsed.content.card_type,
+            data: parsed.content.data
+          })
+          chatMessages.value = [...chatMessages.value]
+          scrollToBottom()
+        }
         else appendThinking(text + '\n')
       }
     } catch (e) {

@@ -1,8 +1,9 @@
 from infrastructure.logging.logger import logger
 from infrastructure.tools.mcp.mcp_servers import (
-    search_mcp_client,
     baidu_mcp_client,
+    search_mcp_client,
 )
+
 
 async def mcp_connect():
     # 建立MCP连接

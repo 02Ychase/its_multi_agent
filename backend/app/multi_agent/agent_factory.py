@@ -1,16 +1,12 @@
-from agents import function_tool, Runner, handoff
-from agents.run import RunConfig
-from langfuse import observe
-
-from multi_agent.technical_agent import technical_agent
-from multi_agent.service_agent import comprehensive_service_agent
-from multi_agent.after_sales_agent import after_sales_agent
-from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
-from services.tool_execution_service import execute_async_tool
-from schemas.tooling import ToolExecutionConfig
-
+from agents import Runner, function_tool
 from infrastructure.logging.logger import logger
-
+from infrastructure.tools.mcp.mcp_servers import baidu_mcp_client, search_mcp_client
+from langfuse import observe
+from multi_agent.after_sales_agent import after_sales_agent
+from multi_agent.service_agent import comprehensive_service_agent
+from multi_agent.technical_agent import technical_agent
+from schemas.tooling import ToolExecutionConfig
+from services.tool_execution_service import execute_async_tool
 
 # 工具执行治理配置
 TECHNICAL_AGENT_TOOL_CONFIG = ToolExecutionConfig(
@@ -54,7 +50,6 @@ async def consult_technical_expert(
         result = await Runner.run(
             technical_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 
@@ -90,7 +85,6 @@ async def query_service_station_and_navigate(
         result = await Runner.run(
             comprehensive_service_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 
@@ -128,7 +122,6 @@ async def consult_after_sales_expert(
         result = await Runner.run(
             after_sales_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 

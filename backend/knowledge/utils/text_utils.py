@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup,Tag
-from markdownify import markdownify as md
 import re
+
+from bs4 import BeautifulSoup, Tag
+from markdownify import markdownify as md
 
 
 class TextUtils:

@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 from services.citation_service import build_citations
 
 

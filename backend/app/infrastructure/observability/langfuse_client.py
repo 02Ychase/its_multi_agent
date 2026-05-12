@@ -1,11 +1,19 @@
-from langfuse import Langfuse
 from config.settings import settings
+from langfuse import Langfuse
 
 
 def create_langfuse_client() -> Langfuse:
     """Create Langfuse client from settings. Returns disabled client if keys not configured."""
     if not settings.LANGFUSE_PUBLIC_KEY or not settings.LANGFUSE_SECRET_KEY:
-        return Langfuse(enabled=False)
+        try:
+            return Langfuse(enabled=False)
+        except TypeError:
+            # Older langfuse versions don't support `enabled` kwarg
+            return Langfuse(
+                public_key="pk-disabled",
+                secret_key="sk-disabled",
+                host="http://localhost:0",
+            )
 
     return Langfuse(
         public_key=settings.LANGFUSE_PUBLIC_KEY,

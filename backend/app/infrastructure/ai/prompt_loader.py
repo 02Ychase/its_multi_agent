@@ -1,5 +1,7 @@
 from pathlib import Path
+
 from infrastructure.logging.logger import logger
+
 
 def load_prompt(prompt_name: str) -> str:
     """
@@ -26,7 +28,7 @@ def load_prompt(prompt_name: str) -> str:
             logger.error(error_msg)
             raise FileNotFoundError(error_msg)
             
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read().strip()
             logger.debug(f"成功加载提示词: {prompt_name}")
             return content

@@ -1,10 +1,11 @@
 import os
 import time
-from  services.crawler.client import KnowledgeApiClient
-from  services.crawler.parser import HtmlParser
-from  utils.text_utils import  TextUtils
-from  config.settings import  settings
-from  repositories.file_repository import FileRepository
+
+from config.settings import settings
+from repositories.file_repository import FileRepository
+from services.crawler.client import KnowledgeApiClient
+from services.crawler.parser import HtmlParser
+from utils.text_utils import TextUtils
 
 
 def  main():

@@ -1,6 +1,7 @@
-from langchain_openai import ChatOpenAI
-from config.settings import settings
 import logging
+
+from config.settings import settings
+from langchain_openai import ChatOpenAI
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,11 +1,12 @@
-from typing import Dict, Any
-from  utils.text_utils import TextUtils
+from typing import Any
+
+from utils.text_utils import TextUtils
 
 
 class HtmlParser:
     """专门负责解析Html格式数据成为MarkDown格式的数据"""
 
-    def parse_html_to_markdown(self, knowledge_no: str, html_data: Dict[str, Any]) -> str:
+    def parse_html_to_markdown(self, knowledge_no: str, html_data: dict[str, Any]) -> str:
         """
         解析html格式成为markdown格式
         :param html_data:html格式数据
@@ -44,7 +45,7 @@ class HtmlParser:
             categories.append(f"问题类别: {question_category_name}")
 
         if  categories:
-            items.append(f"## 分类\n"+"\n".join(categories)+"\n")
+            items.append("## 分类\n"+"\n".join(categories)+"\n")
 
         # 2.5 提取知识库关键词：打散 清洗 在组合（1.相似检索【原数据】可以根据关键词检索 2.提高召回率）
         html_data_key_words=html_data['keyWords']
@@ -68,7 +69,7 @@ class HtmlParser:
         if html_data_version_no and html_data_version_no.strip():
             medata_data.append(f"版本:{html_data_version_no.strip()}")
         if medata_data:
-            items.append(f"## 元信息\n" + "|".join(medata_data) + "\n")
+            items.append("## 元信息\n" + "|".join(medata_data) + "\n")
 
         # 2.7 构建内容（解决方案）
         html_data_content=html_data['content']

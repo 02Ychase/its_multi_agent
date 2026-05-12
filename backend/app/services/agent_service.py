@@ -1,16 +1,18 @@
 import re
+import traceback
 from collections.abc import AsyncGenerator
-from agents.run import Runner, RunConfig
+
+from agents.exceptions import InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered
+from agents.run import Runner
+from infrastructure.logging.logger import logger
 from langfuse import observe
 from multi_agent.orchestrator_agent import orchestrator_agent
 from schemas.request import ChatMessageRequest
-from services.session_service import session_service
+from schemas.response import ContentKind
 from services.conversation_service import conversation_service
+from services.session_service import session_service
 from services.stream_response_service import process_stream_response
 from utils.response_util import ResponseFactory
-from infrastructure.logging.logger import logger
-import traceback
-from schemas.response import ContentKind
 
 
 class MultiAgentService:
@@ -41,7 +43,7 @@ class MultiAgentService:
             if current_user:
                 numeric_id = current_user["user_id"]
                 username = current_user["username"]
-                chat_history = conversation_service.prepare_history(numeric_id, username, session_id, user_query)
+                chat_history = await conversation_service.prepare_history(numeric_id, username, session_id, user_query)
             else:
                 # 兼容旧调用方式
                 chat_history = session_service.prepare_history(user_id, session_id, user_query)
@@ -51,7 +53,6 @@ class MultiAgentService:
                 starting_agent=orchestrator_agent,
                 input=chat_history,
                 max_turns=10,
-                run_config=RunConfig(tracing_disabled=True)
             )
 
             # 4. 处理Agent的事件流（事件流）
@@ -75,6 +76,30 @@ class MultiAgentService:
                 chat_history.append({"role": "assistant", "content": format_agent_result})
                 session_service.save_history(user_id, session_id, chat_history)
 
+        except InputGuardrailTripwireTriggered as e:
+            logger.warning(f"输入护栏触发: {e.guardrail_result.output_info}")
+            reason = e.guardrail_result.output_info.get("reason", "unknown")
+            if reason == "prompt_injection":
+                msg = "检测到不安全的输入内容，请重新描述您的问题。"
+            elif reason == "input_too_long":
+                msg = "输入内容过长，请精简后重试（最多2000字）。"
+            elif reason == "sensitive_content":
+                msg = "请勿在对话中发送敏感个人信息。"
+            else:
+                msg = "输入内容不符合安全要求，请重新描述。"
+            yield "data: " + ResponseFactory.build_text(
+                msg, ContentKind.ANSWER
+            ).model_dump_json() + "\n\n"
+            yield "data: " + ResponseFactory.build_finish().model_dump_json() + "\n\n"
+
+        except OutputGuardrailTripwireTriggered as e:
+            logger.warning(f"输出护栏触发: {e.guardrail_result.output_info}")
+            msg = "系统检测到回复内容可能包含敏感信息，已自动过滤。请重新提问。"
+            yield "data: " + ResponseFactory.build_text(
+                msg, ContentKind.ANSWER
+            ).model_dump_json() + "\n\n"
+            yield "data: " + ResponseFactory.build_finish().model_dump_json() + "\n\n"
+
         except Exception as e:
             # 记录错误日志
             logger.error(f"AgentService.process_query执行出错: {str(e)}")
@@ -87,7 +112,7 @@ class MultiAgentService:
 
             # 如果允许重试，则启动重试流程
             if flag:
-                text = f"🔄 正在尝试自动重试..."
+                text = "🔄 正在尝试自动重试..."
                 yield "data: " + ResponseFactory.build_text(
                     text, ContentKind.PROCESS
                 ).model_dump_json() + "\n\n"

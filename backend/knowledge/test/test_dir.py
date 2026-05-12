@@ -1,4 +1,3 @@
-import  os
 
 # current_dir=os.path.dirname(os.path.abspath(__file__))
 # for temp in os.listdir(current_dir):

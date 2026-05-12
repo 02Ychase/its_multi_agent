@@ -1,17 +1,13 @@
-from agents import set_tracing_disabled
-
-set_tracing_disabled(True)
-from agents import Agent, ModelSettings
+from agents import Agent
 from infrastructure.ai.openai_client import sub_model
+from infrastructure.ai.prompt_loader import load_prompt
 from infrastructure.tools.local.service_station import (
+    query_nearest_repair_shops_by_coords,
     resolve_user_location_from_text,
-    query_nearest_repair_shops_by_coords
 )
-
 from infrastructure.tools.mcp.mcp_servers import (
     baidu_mcp_client,
 )
-from infrastructure.ai.prompt_loader import load_prompt
 
 comprehensive_service_agent = Agent(
     name="service_expert",
@@ -68,7 +64,7 @@ async def run_single_test(case_name: str, input_text: str):
     finally:
         try:
             await baidu_mcp_client.cleanup()
-        except:
+        except Exception:
             pass
 
 

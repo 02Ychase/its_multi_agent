@@ -1,11 +1,11 @@
 
 
+import time
+
+from config.settings import settings
 from repositories.file_repository import FileRepository
 from services.ingestion.ingestion_processor import IngestionProcessor
-from config.settings import settings
-
 from tqdm import tqdm
-import  time
 
 
 def  main():
@@ -31,7 +31,7 @@ def  main():
             try:
                 ingestion_processor.ingest_file(unique_file_path)
                 success += 1
-            except Exception as e:
+            except Exception:
                 fail += 1
             finally:
                 pbar.set_postfix({"success": success, "fail": fail})

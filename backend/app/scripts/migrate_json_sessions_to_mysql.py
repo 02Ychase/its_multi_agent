@@ -10,7 +10,6 @@ Skips sessions that already exist (user_id, session_id).
 """
 
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -46,7 +45,7 @@ def migrate():
         for json_file in user_dir.glob("*.json"):
             session_id = json_file.stem
             try:
-                with open(json_file, "r", encoding="utf-8") as f:
+                with open(json_file, encoding="utf-8") as f:
                     messages = json.load(f)
             except Exception as e:
                 print(f"Skipped {username}/{session_id}: read error: {e}")

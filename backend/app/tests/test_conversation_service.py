@@ -1,5 +1,6 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
@@ -20,18 +21,24 @@ def conversation_service():
     return ConversationService()
 
 
-def test_prepare_history_new_session(mock_db, conversation_service):
+@pytest.mark.asyncio
+async def test_prepare_history_new_session(mock_db, conversation_service):
     conn, cursor = mock_db
     cursor.fetchone.return_value = None
     cursor.lastrowid = 1
+
+    async def _mock_compress(msgs, keep_recent=3):
+        """Mock compress_history that returns messages unchanged."""
+        return msgs
 
     with patch.object(conversation_service._session_repo, "get_or_create_session", return_value=1), \
          patch.object(conversation_service._message_repo, "append_message", return_value=1), \
          patch.object(conversation_service._message_repo, "get_messages_by_session", return_value=[
              ("system", "你是一个有记忆的智能体助手", None, 1, None),
              ("user", "电脑蓝屏怎么办", None, 2, None),
-         ]):
-        result = conversation_service.prepare_history(1, "test_user", "session_001", "电脑蓝屏怎么办")
+         ]), \
+         patch("services.context_compressor.compress_history", side_effect=_mock_compress):
+        result = await conversation_service.prepare_history(1, "test_user", "session_001", "电脑蓝屏怎么办")
 
     assert len(result) == 2
     assert result[0]["role"] == "system"
@@ -39,8 +46,13 @@ def test_prepare_history_new_session(mock_db, conversation_service):
     assert result[1]["content"] == "电脑蓝屏怎么办"
 
 
-def test_prepare_history_existing_session(mock_db, conversation_service):
+@pytest.mark.asyncio
+async def test_prepare_history_existing_session(mock_db, conversation_service):
     conn, cursor = mock_db
+
+    async def _mock_compress(msgs, keep_recent=3):
+        """Mock compress_history that returns messages unchanged."""
+        return msgs
 
     with patch.object(conversation_service._session_repo, "get_or_create_session", return_value=1), \
          patch.object(conversation_service._message_repo, "append_message", return_value=1), \
@@ -51,8 +63,9 @@ def test_prepare_history_existing_session(mock_db, conversation_service):
              ("user", "问题2", None, 4, None),
              ("assistant", "回答2", None, 5, None),
              ("user", "问题3", None, 6, None),
-         ]):
-        result = conversation_service.prepare_history(1, "test_user", "session_001", "问题3")
+         ]), \
+         patch("services.context_compressor.compress_history", side_effect=_mock_compress):
+        result = await conversation_service.prepare_history(1, "test_user", "session_001", "问题3")
 
     assert result[0]["role"] == "system"
     non_system = [m for m in result if m["role"] != "system"]

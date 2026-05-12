@@ -4,7 +4,6 @@
 #
 # for  chunk in sync_make():
 #     print(chunk)
-import asyncio
 
 
 async def sync_make():

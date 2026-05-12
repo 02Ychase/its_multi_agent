@@ -1,15 +1,15 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 # 引入新的模型名称
 from schemas.response import (
-    StreamPacket,
-    TextMessageBody,
+    ContentKind,
     FinishMessageBody,
-    StreamStatus,
     PacketMeta,
-    ContentKind
+    StreamPacket,
+    StreamStatus,
+    StructuredMessageBody,
+    TextMessageBody,
 )
 
 
@@ -36,7 +36,7 @@ class ResponseFactory:
         )
 
     @staticmethod
-    def build_finish(message_id: Optional[str] = None) -> StreamPacket:
+    def build_finish(message_id: str | None = None) -> StreamPacket:
         """
         构建结束信号响应
         """
@@ -47,5 +47,19 @@ class ResponseFactory:
             id=message_id,
             content=FinishMessageBody(),
             status=StreamStatus.FINISHED,
+            metadata=PacketMeta(createTime=str(datetime.now()))
+        )
+
+    @staticmethod
+    def build_structured(card_type: str, data: dict) -> StreamPacket:
+        """构建结构化数据响应"""
+        body = StructuredMessageBody(
+            card_type=card_type,
+            data=data
+        )
+        return StreamPacket(
+            id=str(uuid.uuid4()),
+            content=body,
+            status=StreamStatus.IN_PROGRESS,
             metadata=PacketMeta(createTime=str(datetime.now()))
         )

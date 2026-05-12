@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Optional, Union, List, Literal
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -10,6 +11,7 @@ class ContentKind(str, Enum):
     THINKING = 'THINKING'  # 思考/推理内容 (渲染在折叠区域)
     PROCESS = 'PROCESS'    # 系统流程/工具调用 (渲染在折叠区域)
     ANSWER = 'ANSWER'      # 最终回答 (渲染在主聊天气泡)
+    STRUCTURED = 'STRUCTURED'  # 结构化数据
 
 
 class StreamStatus(str, Enum):
@@ -52,13 +54,23 @@ class FinishMessageBody(MessageBody):
     contentType: Literal['sagegpt/finish'] = 'sagegpt/finish'
 
 
+class StructuredMessageBody(MessageBody):
+    """
+    结构化消息体：承载可被前端渲染为卡片的数据。
+    """
+    contentType: Literal['sagegpt/structured'] = 'sagegpt/structured'
+    kind: ContentKind = ContentKind.STRUCTURED
+    card_type: str = Field(..., description="卡片类型：order_status / warranty_info / repair_progress / service_station")
+    data: dict = Field(..., description="结构化数据")
+
+
 # --- 顶层数据包定义 ---
 
 class PacketMeta(BaseModel):
     """数据包元数据"""
     createTime: str
-    finishReason: Optional[StopReason] = None
-    errorMessage: Optional[str] = None
+    finishReason: StopReason | None = None
+    errorMessage: str | None = None
 
 
 class StreamPacket(BaseModel):
@@ -67,6 +79,6 @@ class StreamPacket(BaseModel):
     这是后端 yield 给前端的最小数据单元。
     """
     id: str
-    content: Union[TextMessageBody, FinishMessageBody]
+    content: TextMessageBody | FinishMessageBody | StructuredMessageBody
     status: StreamStatus
     metadata: PacketMeta

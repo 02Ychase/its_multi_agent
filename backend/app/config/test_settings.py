@@ -1,7 +1,8 @@
-import sys
 import socket
-from pydantic import ValidationError
+import sys
+
 from config.settings import settings
+from pydantic import ValidationError
 
 
 def mask_secret(secret: str | None) -> str:

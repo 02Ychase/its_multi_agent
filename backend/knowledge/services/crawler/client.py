@@ -1,8 +1,9 @@
 import os.path
 from http.client import HTTPException
-from services.crawler.parser import HtmlParser
+
+import requests
 from config.settings import settings
-import  requests
+from services.crawler.parser import HtmlParser
 
 
 class KnowledgeApiClient:

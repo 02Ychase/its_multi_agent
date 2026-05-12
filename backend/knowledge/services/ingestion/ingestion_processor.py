@@ -1,13 +1,12 @@
-import os.path
+import logging
 from pathlib import Path
 
-from repositories.vector_store_repository import VectorStoreRepository
 from langchain_community.document_loaders import TextLoader
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores.utils import filter_complex_metadata
+from langchain_core.documents import Document
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+from repositories.vector_store_repository import VectorStoreRepository
 from utils.markdown_utils import MarkDownUtils
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,17 +22,22 @@ class IngestionProcessor:
 
     def __init__(self):
         self.vector_store = VectorStoreRepository()
+
+        # Markdown 语义分块器：按标题层级切分
+        self.markdown_splitter = MarkdownHeaderTextSplitter(
+            headers_to_split_on=[
+                ("#", "h1"),
+                ("##", "h2"),
+                ("###", "h3"),
+            ],
+            strip_headers=False,  # 保留标题文本在块内容中
+        )
+
+        # 二级分块器：对语义分块后仍过长的块做字符级切分
         self.document_spliter = RecursiveCharacterTextSplitter(
-            chunk_size=1500,
+            chunk_size=1000,        # 从 1500 降低到 1000
             chunk_overlap=200,
-            separators=[
-                "\n## ",
-                "\n**",
-                "\n\n",
-                "\n",
-                " ",
-                ""
-            ]
+            separators=["\n\n", "\n", " ", ""]
         )
 
     def _load_file(self, file_path: str) -> list[Document]:
@@ -107,18 +111,42 @@ class IngestionProcessor:
         for doc in documents:
             doc.metadata['title'] = MarkDownUtils.extract_title(file_path)
 
-        # 3. 切分文档（动态策略：短文档不切，长文档分块 + 标题注入）
+        # 3. 切分文档（语义分块 + 二级字符分块）
         final_document_chunks = []
         for doc in documents:
-            if len(doc.page_content) < 3000:
+            ext = Path(file_path).suffix.lower()
+            content = doc.page_content
+            title = doc.metadata.get('title', '')
+
+            if ext == '.md' and len(content) >= 500:
+                # Markdown 文件：先按标题语义切分
+                md_chunks = self.markdown_splitter.split_text(content)
+                for md_chunk in md_chunks:
+                    chunk_text = md_chunk.page_content
+                    chunk_metadata = {**doc.metadata, **md_chunk.metadata}
+                    if len(chunk_text) > 1200:
+                        # 语义块太长，再做字符级切分
+                        sub_chunks = self.document_spliter.split_text(chunk_text)
+                        for i, sub in enumerate(sub_chunks):
+                            sub_doc = Document(
+                                page_content=f"文档来源:{title}\n{sub}",
+                                metadata={**chunk_metadata, "chunk_index": i}
+                            )
+                            final_document_chunks.append(sub_doc)
+                    else:
+                        final_document_chunks.append(Document(
+                            page_content=f"文档来源:{title}\n{chunk_text}",
+                            metadata=chunk_metadata
+                        ))
+            elif len(content) < 1200:
+                # 短文档不切分
                 final_document_chunks.append(doc)
             else:
-                documents_chunks_list = self.document_spliter.split_documents(documents)
-                for document_chunk in documents_chunks_list:
-                    source = document_chunk.metadata.get('source', file_path)
-                    title = os.path.basename(source)
-                    document_chunk.page_content = f"文档来源:{title}\n{document_chunk.page_content}"
-                final_document_chunks.extend(documents_chunks_list)
+                # 非 Markdown 或无标题结构的长文档：字符级切分
+                chunks = self.document_spliter.split_documents([doc])
+                for chunk in chunks:
+                    chunk.page_content = f"文档来源:{title}\n{chunk.page_content}"
+                final_document_chunks.extend(chunks)
 
         # 4. 过滤不被向量数据库支持的元数据
         clean_documents_chunks = filter_complex_metadata(final_document_chunks)

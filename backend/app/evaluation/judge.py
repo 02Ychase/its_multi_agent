@@ -1,8 +1,8 @@
 import json
 import logging
-from typing import Dict, Optional
-from openai import AsyncOpenAI
+
 from config.settings import settings
+from openai import AsyncOpenAI
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +46,8 @@ class LLMJudge:
         self,
         query: str,
         answer: str,
-        retrieved_docs: Optional[str] = None,
-    ) -> Dict[str, float]:
+        retrieved_docs: str | None = None,
+    ) -> dict[str, float]:
         """
         Evaluate an agent's answer using LLM-as-Judge.
 

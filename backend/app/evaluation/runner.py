@@ -1,27 +1,27 @@
 import asyncio
-import time
-import yaml
 import logging
+import time
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
-from langfuse import observe
-from infrastructure.observability.langfuse_client import langfuse, flush_langfuse
+import yaml
 from evaluation.judge import llm_judge
+from infrastructure.observability.langfuse_client import flush_langfuse, langfuse
+from langfuse import observe
 
 logger = logging.getLogger(__name__)
 
 TEST_CASES_PATH = Path(__file__).parent / "test_cases.yaml"
 
 
-def load_test_cases() -> List[Dict[str, Any]]:
+def load_test_cases() -> list[dict[str, Any]]:
     """Load test cases from YAML file."""
-    with open(TEST_CASES_PATH, 'r', encoding='utf-8') as f:
+    with open(TEST_CASES_PATH, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
 @observe(as_type="agent", name="evaluation_runner")
-async def run_single_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
+async def run_single_case(test_case: dict[str, Any]) -> dict[str, Any]:
     """
     Run a single test case through the agent and evaluate with LLM judge.
 
@@ -49,8 +49,8 @@ async def run_single_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
             chat_history = None
 
         # Run the agent
-        from services.agent_service import MultiAgentService
         from schemas.request import ChatMessageRequest, UserContext
+        from services.agent_service import MultiAgentService
 
         request = ChatMessageRequest(
             query=query,
@@ -69,7 +69,7 @@ async def run_single_case(test_case: Dict[str, Any]) -> Dict[str, Any]:
                     data = json.loads(data_str)
                     if data.get("kind") == "ANSWER":
                         answer_parts.append(data.get("content", ""))
-                except:
+                except Exception:
                     pass
 
         answer = "".join(answer_parts)

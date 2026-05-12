@@ -1,6 +1,6 @@
-import os
-import sys
 import logging
+import sys
+
 # 这是一个高级的文件处理器，它能根据时间（比如每天午夜）自动切割日志文件，防止一个文件无限变大
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path

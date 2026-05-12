@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 from infrastructure.logging.logger import logger
 
@@ -35,7 +35,7 @@ class SessionRepository:
 
     def load_session(
             self, user_id: str, session_id: str
-    ) -> Optional[List[Dict[str, Any]]]:
+    ) -> list[dict[str, Any]] | None:
         """从文件加载会话数据。
 
         Args:
@@ -58,7 +58,7 @@ class SessionRepository:
             return json.load(f)
 
     def save_session(
-            self, user_id: str, session_id: str, data: List[Dict[str, Any]]
+            self, user_id: str, session_id: str, data: list[dict[str, Any]]
     ) -> None:
         """保存会话数据到文件。
 
@@ -78,7 +78,7 @@ class SessionRepository:
 
     def get_all_sessions_metadata(
             self, user_id: str
-    ) -> List[Tuple[str, str, Union[List, Exception]]]:
+    ) -> list[tuple[str, str, list | Exception]]:
         """获取用户所有会话的元数据和内容。
 
         Args:

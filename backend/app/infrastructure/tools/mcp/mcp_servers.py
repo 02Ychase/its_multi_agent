@@ -1,8 +1,9 @@
 import asyncio
 import json
+from typing import Any
+
+from agents.mcp import MCPServerSse, MCPServerStreamableHttp
 from config.settings import settings
-from agents.mcp import MCPServerStreamableHttp, MCPServerSse
-from typing import Dict, Any
 
 # 1. 定义百炼的通用搜索MCP客户端 (使用Streamable HTTP方式)
 search_mcp_client = MCPServerStreamableHttp(
@@ -38,7 +39,7 @@ baidu_mcp_client = MCPServerSse(
 async def run_mcp_call(
         mcp_instance: MCPServerSse,
         tool_name: str,
-        tool_args: Dict[str, Any]
+        tool_args: dict[str, Any]
 ):
     """
     执行流程：连接 -> 列出所有工具(看参数) -> 调用指定工具 -> 打印结果 -> 断开
@@ -50,12 +51,12 @@ async def run_mcp_call(
 
     try:
         # --- 1. 连接 ---
-        print(f" [连接] 正在连接服务器...")
+        print(" [连接] 正在连接服务器...")
         await mcp_instance.connect()
-        print(f" [连接] 成功")
+        print(" [连接] 成功")
 
         # --- 2. 列出工具  mcp服务下有多少个工具---
-        print(f"\n [列表] 正在获取工具列表及参数定义...")
+        print("\n [列表] 正在获取工具列表及参数定义...")
         tools_list = await mcp_instance.list_tools()
 
         if tools_list:
@@ -63,7 +64,7 @@ async def run_mcp_call(
             for i, tool in enumerate(tools_list, 1):
                 print(f"\n    [{i}] 工具名: {tool.name}")
                 print(f"       描述: {tool.description}")
-                print(f"       参数定义 (Schema):")
+                print("       参数定义 (Schema):")
                 # 使用 indent=2 让参数结构清晰可见(inputSchema:工具参数（字典）)
                 print(json.dumps(tool.inputSchema, indent=2, ensure_ascii=False))
         else:
@@ -77,7 +78,7 @@ async def run_mcp_call(
 
         # 执行核心调用（调用mcp服务中某一个工具）
         result = await mcp_instance.call_tool(tool_name, tool_args)
-        print(f"\n [响应] 服务器返回结果:")
+        print("\n [响应] 服务器返回结果:")
 
         # --- 4. 打印结果 ---
         for content in result.content:
@@ -97,7 +98,7 @@ async def run_mcp_call(
 
     finally:
         # --- 5. 清理 ---
-        print(f"\n [断开] 正在清理连接...")
+        print("\n [断开] 正在清理连接...")
         await mcp_instance.cleanup()
         print(f" {server_name} 测试结束\n")
 
@@ -111,7 +112,7 @@ async def test_bailian_search():
     测试百炼搜索 (使用全局 search_mcp)
     """
     await run_mcp_call(
-        mcp_instance=search_mac_client,
+        mcp_instance=search_mcp_client,
         tool_name="bailian_web_search",  # 准备测试联网搜索工具
         tool_args={"query": "小米公司今天的股价如何?"}  # query
     )
@@ -138,7 +139,7 @@ async def test_baidu_map():
     # )
 
     await run_mcp_call(
-        mcp_instance=baidu_map_mcp,
+        mcp_instance=baidu_mcp_client,
         tool_name="map_uri",  # (拉起百度地图页面)
         tool_args={
             "service": "direction"

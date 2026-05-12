@@ -1,22 +1,27 @@
-import os.path
 import logging
-import aiofiles
+import os.path
 import shutil
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-from fastapi import APIRouter, UploadFile, File, HTTPException
+
+from config.settings import settings
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
-from services.ingestion.ingestion_processor import IngestionProcessor, SUPPORTED_EXTENSIONS
-from schemas.schema import UploadResponse, QueryResponse, QueryRequest, RetrievalResponse, DocumentListResponse, DocumentActionResponse
-from services.retrieval_service import RetrievalService
-from services.query_service import QueryService
+from schemas.schema import (
+    DocumentActionResponse,
+    DocumentListResponse,
+    QueryRequest,
+    QueryResponse,
+    RetrievalResponse,
+    UploadResponse,
+)
 from services import document_service
 from services.citation_service import build_citations
+from services.ingestion.ingestion_processor import IngestionProcessor
+from services.query_service import QueryService
+from services.retrieval_service import RetrievalService
 from services.upload_validation import sanitize_filename, validate_upload_extension, validate_upload_size
-from config.settings import settings
-
-import tempfile
 
 # 1.创建APIRouter
 router = APIRouter()
@@ -92,6 +97,12 @@ async def upload_file(file: UploadFile = File(...)):
         permanent_path = os.path.join(uploaded_dir, safe_filename)
         shutil.copy2(tmp_md_path, permanent_path)
         logger.info(f"文档已保存到永久目录:{permanent_path}")
+
+        # 8. 触发 BM25 索引重建
+        try:
+            retrieval_service.bm25_retriever.rebuild_index()
+        except Exception as e:
+            logger.warning(f"BM25 索引重建失败（不影响上传）: {e}")
 
         return UploadResponse(
             status="success",
@@ -260,3 +271,18 @@ async def reindex_document(document_id: str):
     except Exception as e:
         logger.error(f"重建文档索引失败: {str(e)}")
         raise HTTPException(status_code=500, detail="重建文档索引失败")
+
+
+@router.get("/health", summary="知识库健康检查")
+async def health_check():
+    checks = {}
+    try:
+        from repositories.vector_store_repository import VectorStoreRepository
+        vs = VectorStoreRepository()
+        count = vs.vector_database._collection.count()
+        checks["chromadb"] = f"ok ({count} vectors)"
+    except Exception as e:
+        checks["chromadb"] = f"error: {str(e)}"
+
+    all_ok = all("ok" in v for v in checks.values())
+    return {"status": "healthy" if all_ok else "degraded", "checks": checks}

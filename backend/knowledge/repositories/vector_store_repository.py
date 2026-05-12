@@ -1,16 +1,17 @@
 # 1. 优先import
 
-import  logging
+import logging
+
 logging.basicConfig(level=logging.INFO)
 logger=logging.getLogger(__name__)
 
 
 # 2. from三方的
-from langchain_chroma import Chroma
+
 from config.settings import settings
+from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from typing import List
 
 # 3. from 自己的
 
@@ -74,7 +75,7 @@ class VectorStoreRepository:
 
 
 
-    def    embedd_document(self,text:str)->List[float]:
+    def    embedd_document(self,text:str)->list[float]:
         """
           对query进行向量化
         Args:
@@ -86,7 +87,7 @@ class VectorStoreRepository:
         """
         return self.embedding.embed_query(text)
 
-    def embedd_documents(self, texts:List[str], batch_size:int=10)->List[List[float]]:
+    def embedd_documents(self, texts:list[str], batch_size:int=10)->list[list[float]]:
         """
         对字符串列表进行向量化（分批处理，兼容DashScope API限制）
         Args:
@@ -105,7 +106,7 @@ class VectorStoreRepository:
         return all_embeddings
 
 
-    def  search_similarity_with_score(self,user_question:str,top_k:int=5)->List[tuple[Document, float]]:
+    def  search_similarity_with_score(self,user_question:str,top_k:int=5)->list[tuple[Document, float]]:
         """
          相似性检索带文档分数
          分数（chroma向量数据库）：返回是L2距离得分（分数值越小越相似），不是余弦相似度的得分（分数余额高越相似） 距离得分：1-余弦相似度得分
@@ -119,7 +120,7 @@ class VectorStoreRepository:
         return self.vector_database.similarity_search_with_score(user_question,top_k)
 
 
-    def delete_by_ids(self, ids: List[str]) -> None:
+    def delete_by_ids(self, ids: list[str]) -> None:
         """
         根据 ID 列表删除向量数据
         Args:

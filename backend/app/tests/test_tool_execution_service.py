@@ -1,6 +1,7 @@
 import asyncio
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from schemas.tooling import ToolExecutionConfig
 from services.tool_execution_service import execute_async_tool, execute_sync_tool, redact_mapping
 

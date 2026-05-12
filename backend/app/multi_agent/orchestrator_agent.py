@@ -1,8 +1,9 @@
 import asyncio
 from agents import Agent, Runner
-from infrastructure.ai.openai_client import sub_model
+from infrastructure.ai.openai_client import main_model
 from infrastructure.ai.prompt_loader import load_prompt
 from multi_agent.agent_factory import AGENT_TOOLS
+from multi_agent.guardrails import input_guardrail, output_guardrail
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
 from contextlib import AsyncExitStack
 
@@ -10,8 +11,10 @@ from contextlib import AsyncExitStack
 orchestrator_agent = Agent(
     name="orchestrator",
     instructions=load_prompt("orchestrator_v2"),
-    model=sub_model,
+    model=main_model,
     tools=AGENT_TOOLS,
+    input_guardrails=[input_guardrail],
+    output_guardrails=[output_guardrail],
 )
 
 

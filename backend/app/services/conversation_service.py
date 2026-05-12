@@ -11,7 +11,7 @@ class ConversationService:
         self._session_repo = session_repo
         self._message_repo = message_repo
 
-    def prepare_history(self, user_id: int, username: str, session_id: str | None, user_input: str, max_turn: int = 3) -> List[Dict[str, Any]]:
+    async def prepare_history(self, user_id: int, username: str, session_id: str | None, user_input: str, max_turn: int = 3) -> List[Dict[str, Any]]:
         target_session_id = session_id if session_id else self.DEFAULT_SESSION_ID
         session_pk = self._session_repo.get_or_create_session(user_id, target_session_id)
 
@@ -20,7 +20,15 @@ class ConversationService:
         messages = self._message_repo.get_messages_by_session(session_pk)
         chat_history = [{"role": row[0], "content": row[1]} for row in messages]
 
-        return self._truncate_history(chat_history, max_turn)
+        # 分离 system 消息
+        system_msgs = [m for m in chat_history if m.get("role") == "system"]
+        non_system_msgs = [m for m in chat_history if m.get("role") != "system"]
+
+        # 使用智能压缩替代简单截断
+        from services.context_compressor import compress_history
+        compressed = await compress_history(non_system_msgs, keep_recent=max_turn)
+
+        return system_msgs + compressed
 
     def append_message(self, user_id: int, username: str, session_id: str | None, role: str, content: str, content_kind: str | None = None, metadata: dict | None = None) -> None:
         target_session_id = session_id if session_id else self.DEFAULT_SESSION_ID

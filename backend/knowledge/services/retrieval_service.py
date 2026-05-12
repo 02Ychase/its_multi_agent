@@ -1,3 +1,4 @@
+import os
 import logging
 import jieba
 import re
@@ -13,6 +14,7 @@ from utils.markdown_utils import MarkDownUtils
 from config.settings import settings
 from sklearn.metrics.pairwise import cosine_similarity
 from langfuse import observe
+from services.query_router import classify_query, decompose_query, QueryComplexity
 
 
 class RetrievalService:
@@ -35,6 +37,9 @@ class RetrievalService:
         self._hyde_service = None
         self._bm25_retriever = None
         self._reranker_service = None
+        # 标题元数据缓存
+        self._title_metadata_cache = None
+        self._title_cache_hash = None
 
     @property
     def hyde_service(self):
@@ -59,50 +64,62 @@ class RetrievalService:
 
     @observe(as_type="retriever", name="rag_retrieval")
     def retrieval(self, user_question: str) -> List[Document]:
-        """
-        Core retrieval method with hybrid search pipeline.
+        # 0. 查询路由
+        complexity = classify_query(user_question)
 
-        Args:
-            user_question: The user's question
+        if complexity == QueryComplexity.SIMPLE:
+            return self._retrieval_simple(user_question)
+        elif complexity == QueryComplexity.COMPLEX:
+            return self._retrieval_complex(user_question)
+        else:
+            return self._retrieval_standard(user_question)
 
-        Returns:
-            List of top-K relevant documents
-        """
-        # 1. HyDE: Generate hypothetical document for better vector search
+    def _retrieval_simple(self, user_question: str) -> List[Document]:
+        """简单查询：跳过 HyDE，直接检索。"""
+        bm25_candidates = self._search_bm25(user_question)
+        vector_candidates = self._search_based_vector(user_question)
+        title_candidates = self._search_based_title(user_question)
+        all_candidates = bm25_candidates + vector_candidates + title_candidates
+        unique_candidates = self._deduplicate(all_candidates)
+        if not unique_candidates:
+            return []
+        if settings.RERANKER_ENABLED:
+            return self.reranker_service.rerank(user_question, unique_candidates)
+        return self._cosine_rerank(user_question, unique_candidates)
+
+    def _retrieval_standard(self, user_question: str) -> List[Document]:
+        """标准查询：完整 HyDE + 三路检索 + 重排（原有逻辑）。"""
         if settings.HYDE_ENABLED:
             search_query = self.hyde_service.generate_hypothetical_document(user_question)
         else:
             search_query = user_question
-
-        # 2. Three-way retrieval
-        # 2.1 BM25 keyword retrieval
         bm25_candidates = self._search_bm25(user_question)
-
-        # 2.2 Vector retrieval (using HyDE query)
         vector_candidates = self._search_based_vector(search_query)
-
-        # 2.3 Title-based retrieval (jieba)
         title_candidates = self._search_based_title(user_question)
-
-        # 3. Merge all candidates
         all_candidates = bm25_candidates + vector_candidates + title_candidates
-        logger.info(f"Retrieved {len(bm25_candidates)} BM25 + {len(vector_candidates)} vector + {len(title_candidates)} title = {len(all_candidates)} total")
-
-        # 4. Deduplicate
         unique_candidates = self._deduplicate(all_candidates)
-        logger.info(f"After dedup: {len(unique_candidates)} unique documents")
-
         if not unique_candidates:
             return []
-
-        # 5. Rerank with bge-reranker
         if settings.RERANKER_ENABLED:
-            top_documents = self.reranker_service.rerank(user_question, unique_candidates)
-        else:
-            # Fallback: cosine similarity reranking
-            top_documents = self._cosine_rerank(user_question, unique_candidates)
+            return self.reranker_service.rerank(user_question, unique_candidates)
+        return self._cosine_rerank(user_question, unique_candidates)
 
-        return top_documents
+    def _retrieval_complex(self, user_question: str) -> List[Document]:
+        """复杂查询：分解为子查询，分别检索后合并。"""
+        sub_queries = decompose_query(user_question)
+        all_candidates = []
+        for sub_q in sub_queries:
+            bm25_candidates = self._search_bm25(sub_q)
+            vector_candidates = self._search_based_vector(sub_q)
+            all_candidates.extend(bm25_candidates + vector_candidates)
+        title_candidates = self._search_based_title(user_question)
+        all_candidates.extend(title_candidates)
+        unique_candidates = self._deduplicate(all_candidates)
+        if not unique_candidates:
+            return []
+        if settings.RERANKER_ENABLED:
+            return self.reranker_service.rerank(user_question, unique_candidates)
+        return self._cosine_rerank(user_question, unique_candidates)
 
     def _search_bm25(self, user_question: str) -> List[Document]:
         """BM25 keyword retrieval."""
@@ -113,9 +130,32 @@ class RetrievalService:
         documents_with_score = self.chroma_vector.search_similarity_with_score(query, top_k=5)
         return [doc for doc, _ in documents_with_score]
 
+    def _get_cached_title_metadata(self):
+        """获取标题元数据，优先从缓存读取。"""
+        import hashlib
+        current_hash = self._compute_dir_hash(settings.CRAWL_OUTPUT_DIR)
+        if self._title_metadata_cache is not None and self._title_cache_hash == current_hash:
+            return [dict(m) for m in self._title_metadata_cache]
+        self._title_metadata_cache = MarkDownUtils.collect_md_metadata(settings.CRAWL_OUTPUT_DIR)
+        self._title_cache_hash = current_hash
+        logger.info(f"Title metadata cache refreshed: {len(self._title_metadata_cache)} entries")
+        return [dict(m) for m in self._title_metadata_cache]
+
+    def _compute_dir_hash(self, dir_path: str) -> str:
+        import hashlib
+        hasher = hashlib.md5()
+        if not os.path.exists(dir_path):
+            return ""
+        for fname in sorted(os.listdir(dir_path)):
+            fpath = os.path.join(dir_path, fname)
+            if os.path.isfile(fpath):
+                stat = os.stat(fpath)
+                hasher.update(f"{fname}:{stat.st_size}:{stat.st_mtime}".encode())
+        return hasher.hexdigest()
+
     def _search_based_title(self, user_query: str) -> List[Document]:
-        """Title-based retrieval with jieba matching."""
-        mds_metadata = MarkDownUtils.collect_md_metadata(settings.CRAWL_OUTPUT_DIR)
+        """Title-based retrieval with caching."""
+        mds_metadata = self._get_cached_title_metadata()
         rough_mds_metadata = self.rough_ranking(user_query, mds_metadata)
         fine_mds_metadata = self.fine_ranking(user_query, rough_mds_metadata)
 

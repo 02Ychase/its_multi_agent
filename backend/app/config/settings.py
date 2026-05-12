@@ -140,6 +140,17 @@ class Settings(BaseSettings):
         if not has_service:
             raise ValueError("必须配置至少一个 AI 服务 (主模型或子模型)")
 
+        # JWT 密钥安全检查
+        import logging
+        _logger = logging.getLogger("config")
+        INSECURE_DEFAULTS = {"change-me-in-production", "secret", "test", ""}
+        if self.JWT_SECRET_KEY in INSECURE_DEFAULTS:
+            _logger.warning(
+                "⚠️  JWT_SECRET_KEY 使用了不安全的默认值，"
+                "请在 .env 中配置一个至少 32 字符的随机密钥。"
+                "生产环境中此配置将导致安全漏洞。"
+            )
+
         return self
 
 

@@ -93,6 +93,12 @@ async def upload_file(file: UploadFile = File(...)):
         shutil.copy2(tmp_md_path, permanent_path)
         logger.info(f"文档已保存到永久目录:{permanent_path}")
 
+        # 8. 触发 BM25 索引重建
+        try:
+            retrieval_service.bm25_retriever.rebuild_index()
+        except Exception as e:
+            logger.warning(f"BM25 索引重建失败（不影响上传）: {e}")
+
         return UploadResponse(
             status="success",
             message="文档上传知识库成功",
@@ -260,3 +266,18 @@ async def reindex_document(document_id: str):
     except Exception as e:
         logger.error(f"重建文档索引失败: {str(e)}")
         raise HTTPException(status_code=500, detail="重建文档索引失败")
+
+
+@router.get("/health", summary="知识库健康检查")
+async def health_check():
+    checks = {}
+    try:
+        from repositories.vector_store_repository import VectorStoreRepository
+        vs = VectorStoreRepository()
+        count = vs.vector_database._collection.count()
+        checks["chromadb"] = f"ok ({count} vectors)"
+    except Exception as e:
+        checks["chromadb"] = f"error: {str(e)}"
+
+    all_ok = all("ok" in v for v in checks.values())
+    return {"status": "healthy" if all_ok else "degraded", "checks": checks}

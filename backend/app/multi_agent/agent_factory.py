@@ -1,5 +1,4 @@
 from agents import function_tool, Runner, handoff
-from agents.run import RunConfig
 from langfuse import observe
 
 from multi_agent.technical_agent import technical_agent
@@ -54,7 +53,6 @@ async def consult_technical_expert(
         result = await Runner.run(
             technical_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 
@@ -90,7 +88,6 @@ async def query_service_station_and_navigate(
         result = await Runner.run(
             comprehensive_service_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 
@@ -128,7 +125,6 @@ async def consult_after_sales_expert(
         result = await Runner.run(
             after_sales_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
 

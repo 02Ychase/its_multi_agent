@@ -37,7 +37,7 @@ async def test_prepare_history_new_session(mock_db, conversation_service):
              ("system", "你是一个有记忆的智能体助手", None, 1, None),
              ("user", "电脑蓝屏怎么办", None, 2, None),
          ]), \
-         patch("services.conversation_service.compress_history", side_effect=_mock_compress):
+         patch("services.context_compressor.compress_history", side_effect=_mock_compress):
         result = await conversation_service.prepare_history(1, "test_user", "session_001", "电脑蓝屏怎么办")
 
     assert len(result) == 2
@@ -64,7 +64,7 @@ async def test_prepare_history_existing_session(mock_db, conversation_service):
              ("assistant", "回答2", None, 5, None),
              ("user", "问题3", None, 6, None),
          ]), \
-         patch("services.conversation_service.compress_history", side_effect=_mock_compress):
+         patch("services.context_compressor.compress_history", side_effect=_mock_compress):
         result = await conversation_service.prepare_history(1, "test_user", "session_001", "问题3")
 
     assert result[0]["role"] == "system"
